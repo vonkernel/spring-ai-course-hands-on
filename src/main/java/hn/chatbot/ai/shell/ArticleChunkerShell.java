@@ -3,6 +3,8 @@ package hn.chatbot.ai.shell;
 import hn.chatbot.ai.ArticleChunker;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,8 +15,29 @@ import java.util.List;
 @Component
 public class ArticleChunkerShell implements ArticleChunker {
 
+    private static final int HARD_LIMIT = 2_000;
+
     @Override
     public List<String> chunk(String body) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        List<String> paragraphs = Arrays.stream(body.split("\\n\\s*\\n"))
+                .map(String::strip)
+                .filter(paragraph -> !paragraph.isEmpty())
+                .toList();
+
+        if (paragraphs.isEmpty()) {
+            paragraphs = List.of(body.strip());
+        }
+
+        List<String> chunks = new ArrayList<>();
+        for (String paragraph : paragraphs) {
+            if (paragraph.length() <= HARD_LIMIT) {
+                chunks.add(paragraph);
+                continue;
+            }
+            for (int i = 0; i < paragraph.length(); i += HARD_LIMIT) {
+                chunks.add(paragraph.substring(i, Math.min(i + HARD_LIMIT, paragraph.length())));
+            }
+        }
+        return chunks;
     }
 }
