@@ -10,7 +10,7 @@ package hn.chatbot.ai;
  *
  * 검색이 찾아낸 Candidate 를 그대로 받지 않는다. matchedPlans 처럼 검색 사정으로
  * 생긴 값은 LLM 이 쓸 일이 없고, 그걸 받으면 ai/ 가 검색 계층에 묶인다.
- * 옮기는 것은 부르는 쪽(IssueTools · TopicService)의 몫이다.
+ * 옮기는 것은 부르는 쪽(RelevancePostProcessor · TopicService)의 몫이다.
  */
 public record AnalysisTarget(long storyId, String title, String summary,
                              String communityReaction, String excerpt) {

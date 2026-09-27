@@ -1,6 +1,5 @@
 package hn.chatbot.service.chat;
 
-import hn.chatbot.ai.RelevanceJudge;
 import hn.chatbot.search.SearchService;
 import hn.chatbot.service.chat.port.ChatQuery;
 import hn.chatbot.service.topic.TopicService;
@@ -44,15 +43,15 @@ import java.util.List;
 public class IssueTools {
 
     private final SearchService searchService;
-    private final RelevanceJudge relevanceJudge;
+    private final RelevancePostProcessor relevancePostProcessor;
     private final TopicService topicService;
     private final ChatQuery chatQuery;
     private final ChatMemory chatMemory;
 
-    public IssueTools(SearchService searchService, RelevanceJudge relevanceJudge, TopicService topicService,
-                      ChatQuery chatQuery, ChatMemory chatMemory) {
+    public IssueTools(SearchService searchService, RelevancePostProcessor relevancePostProcessor,
+                      TopicService topicService, ChatQuery chatQuery, ChatMemory chatMemory) {
         this.searchService = searchService;
-        this.relevanceJudge = relevanceJudge;
+        this.relevancePostProcessor = relevancePostProcessor;
         this.topicService = topicService;
         this.chatQuery = chatQuery;
         this.chatMemory = chatMemory;
@@ -66,13 +65,18 @@ public class IssueTools {
      *
      * 흐름
      *
-     * 1 SearchService.search 로 후보를 찾는다
-     * 2 ChatQuery.bodyExcerpts 로 후보의 원문 앞부분을 가져와 RelevanceJudge 로 근거를 고른다.
- *   판단에 넘기는 질문은 query 인자다. 후보가 0건이면 판단을 건너뛰고 빈 목록으로 3 을 진행한다
-     * 3 ChatQuery.storyDetails 로 근거 내용을 채우고 SearchEvidence.assemble 로 합친다
-     * 4 ChatTurn.from(ctx).publish 로 화면에 사건을 보낸다
-     * 5 ctx 의 conversationId 로 SearchRecord.of 문구를 AssistantMessage 로 기억에 기록한다
-     * 6 SearchEvidence 를 돌려준다. 모델이 이것으로 답을 쓴다
+     * 1 SearchContext.query 로 Query 를 만든다. 검색어는 query 인자, 필터는 techField · category,
+     *   사용자 원문은 ctx 의 SearchContext.USER_QUESTION 이다. 원문은 계획 1 이 쓴다.
+     *   모델이 다듬은 검색어에는 사용자가 쓴 키워드가 그대로 남지 않기 때문이다
+     * 2 SearchService.retrieve 로 후보를 찾는다. 계획별 요약은 Query 의 컨텍스트에 기록된다
+     * 3 RelevancePostProcessor.process 로 근거를 고른다
+     * 4 SearchEvidence.of(Query, 근거) 로 합친다
+     * 5 ChatTurn.from(ctx).publish 로 화면에 사건을 보낸다
+     * 6 ctx 의 conversationId 로 SearchRecord.of 문구를 AssistantMessage 로 기억에 기록한다
+     * 7 SearchEvidence 를 돌려준다. 모델이 이것으로 답을 쓴다
+     *
+     * 2 · 3 은 세션 5 에서 RetrievalAugmentationAdvisor 에 넘겼던 부품 그대로다.
+     * 그때는 Advisor 가 질문마다 불렀고, 이제는 모델이 이 도구를 골랐을 때만 부른다.
      */
     public SearchEvidence searchIssues(String query, String techField, String category, ToolContext ctx) {
         throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
