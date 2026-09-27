@@ -12,9 +12,10 @@ Spring AI 실습 프로젝트. Hacker News 의 기술 이슈를 수집해 AI 로
 ai/shell/                 LLM · Moderation 호출 9개
 search/shell/             검색 서비스
 search/plan/              벡터 검색 계획 2개 (BodyVectorPlan · SummaryVectorPlan)
+service/chat/RelevancePostProcessor   근거 후처리
 service/chat/IssueTools   모델이 호출하는 도구 7종
 service/setup/shell/      스토리 하나의 단계 처리 (StoryProcessorShell)
-service/chat/ChatServiceShell   Q&A 연결
+service/chat/ChatServiceShell   Q&A 연결 (세션 5 · 6 두 단계)
 ```
 
 **각 클래스의 Javadoc 이 구현 명세다.** 입력과 반환값, 주의 사항이
@@ -32,6 +33,22 @@ Javadoc 에 적혀 있다. 구현 전에 읽는다.
    계약대로 반환 · 예외 무시 없음 · `./gradlew test` 통과)에 따라 검증한다.
 
 이 절차를 이후의 모든 구현 요청에 적용한다.
+
+## 프롬프트와 생성 결과의 언어
+
+실습에서 쓰는 프롬프트와 모델이 만드는 결과의 언어를 맞춘다. 수강생마다 언어가 갈리지 않게 한다.
+
+- **빈 구현에 쓰는 프롬프트(system · user 문구)는 한국어로 쓴다.**
+- **모델이 만드는 서술형 결과가 한국어로 나오도록 프롬프트에 명시한다.** 적지 않으면 영어 원문을
+  따라가 결과마다 언어가 섞인다. 대상은 다음과 같다.
+  - `IssueAnalyzer`: `summary` · `communityReaction` · `practicalImplication` · `unsuitableReason`
+  - `TopicSummarizer`: 분야 요약
+- **다음은 바꾸지 않는다.** 바꾸면 기능이 깨진다.
+  - 원문을 그대로 옮기는 값: 본문 추출 결과(`ArticleBodyExtractor`), 마스킹 구간(`HarmfulPhraseDetector`),
+    근거 대목(`RelevanceJudge` 의 `passage`). 원문이 영어면 영어 그대로 둔다
+  - 허용값 목록의 값: `techField` · `category`
+  - `keywords` 의 고유명사 · 제품명 표기(`VMware`, `llama.cpp`). 검색 계획 1 이 사용자가 쓴 표기로 찾는다
+- Q&A 답변은 답변 규칙(`AnswerGenerator`)대로 질문과 같은 언어로 한다.
 
 ## solution 브랜치 열람 금지
 
@@ -52,7 +69,7 @@ Javadoc 에 적혀 있다. 구현 전에 읽는다.
 domain/  persistence/  web/  adapter/  config/
 service/*/model/  service/*/port/
 service/topic/DefaultTopicService   service/setup/AnalysisMapper
-service/chat/ChatTurn   service/chat/SearchEvidence   service/chat/SearchRecord
+service/chat/ChatTurn   service/chat/SearchEvidence   service/chat/SearchRecord   service/chat/EvidenceDocuments
 service/setup/PipelineSetupService   service/setup/StageTracker   service/setup/PipelinePolicy
 ai/*.java (shell/ 제외)   search/*.java (shell/ 제외)
 search/plan/KeywordArrayPlan   search/plan/FullTextPlan

@@ -11,8 +11,12 @@ import java.util.List;
  *
  * suitable 과 unsuitableReason 은 분석과 동시에 채워지므로 별도 API 호출이 없다.
  *
- * keywords 는 6개에서 10개를 받는다. 검색 계획 1(KeywordArrayPlan)이 질의 단어와 이 배열의
- * 겹침을 보므로, 적게 뽑으면 그 계획이 0건 나는 빈도가 올라간다.
+ * keywords 는 6개에서 10개를 받는다. 검색 계획 1(KeywordArrayPlan)이 사용자 질문 안에 이 배열의
+ * 키워드가 들어 있는지 보므로, 적게 뽑으면 그 계획이 0건 나는 빈도가 올라간다.
+ *
+ * 서술 필드(summary · communityReaction · practicalImplication · unsuitableReason)는 한국어로 받는다.
+ * keywords 의 고유명사 · 제품명은 원문 표기 그대로 둔다(VMware, llama.cpp). 사용자가 쓴 표기로
+ * 계획 1 이 찾기 때문이다. techField · category 는 허용값 목록의 표기 그대로다.
  *
  * 구조화 출력은 값이 없는 String 필드에 null 이 아니라 빈 문자열을 채워 돌려준다.
  * analysis 에는 CHECK (suitable = (unsuitable_reason IS NULL)) 가 걸려 있어

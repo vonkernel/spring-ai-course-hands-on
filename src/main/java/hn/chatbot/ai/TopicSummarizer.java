@@ -8,6 +8,8 @@ import java.util.List;
  *
  * 스토리마다 제목 · 요약 · 커뮤니티 반응이 들어온다. 스토리를 하나씩 나열하지 말고
  * 여러 스토리에 공통으로 흐르는 쟁점을 묶어 요약한다.
+ *
+ * 요약은 한국어로 쓰게 프롬프트에 적는다.
  */
 public interface TopicSummarizer {
 
