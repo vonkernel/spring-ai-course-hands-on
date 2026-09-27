@@ -40,6 +40,11 @@ public class JpaStoryIndexQuery implements StoryIndexQuery {
     }
 
     @Override
+    public List<String> keywordVocabulary() {
+        return analyses.findDistinctKeywords();
+    }
+
+    @Override
     public List<PlanHit> byFullText(String query, String techField, String category, int limit) {
         return articles.searchByFullText(query, techField, category, limit).stream()
                 .map(r -> new PlanHit(r.getStoryId(), r.getScore()))

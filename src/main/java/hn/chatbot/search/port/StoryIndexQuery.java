@@ -13,8 +13,14 @@ import java.util.List;
  */
 public interface StoryIndexQuery {
 
-    /** 계획 1: keywords 배열 겹침. suitable 인 것만 대상이고, techField · category 가 null 이면 그 축으로 거르지 않는다. */
+    /**
+     * 계획 1: keywords 배열 겹침. suitable 인 것만 대상이고, techField · category 가 null 이면 그 축으로 거르지 않는다.
+     * 일치한 키워드가 많은 스토리가 앞에 온다.
+     */
     List<PlanHit> byKeywords(List<String> keywords, String techField, String category, int limit);
+
+    /** 계획 1 이 질문 안에서 찾을 키워드 목록. suitable 인 분석의 키워드를 저장된 표기 그대로, 중복 없이. */
+    List<String> keywordVocabulary();
 
     /** 계획 2: websearch_to_tsquery 전문 검색. 점수는 ts_rank 다. 필터 규칙은 계획 1 과 같다. */
     List<PlanHit> byFullText(String query, String techField, String category, int limit);

@@ -62,7 +62,7 @@ class RepositoryQueryTest {
                 "Appreciation", null, true, null));
         // 검색 대상에서 빠져야 하는 행
         em.persist(new Story(3L, "A poem about clouds", null, "carol", 10, 2, null, Instant.now()));
-        em.persist(new Analysis(3L, null, null, null, new String[] {"VMware"},
+        em.persist(new Analysis(3L, null, null, null, new String[] {"VMware", "cloud poetry"},
                 null, null, false, "기술과 무관한 주제"));
         em.flush();
     }
@@ -77,6 +77,24 @@ class RepositoryQueryTest {
                 .contains(1L, 2L);
         assertThat(analysisRepository.searchByKeywords(new String[] {"없는키워드"}, null, null, 100))
                 .isEmpty();
+    }
+
+    @Test
+    @DisplayName("계획 1 — 일치한 키워드가 많은 스토리가 앞에 온다")
+    void keywordArrayOrdersByMatchCount() {
+        List<Long> hits = analysisRepository.searchByKeywords(new String[] {"VMware", "pgvector", "HNSW"}, null, null, 100);
+
+        assertThat(hits).contains(1L, 2L);
+        assertThat(hits.indexOf(2L)).as("두 개가 맞은 2번이 한 개가 맞은 1번보다 앞").isLessThan(hits.indexOf(1L));
+    }
+
+    @Test
+    @DisplayName("계획 1 — 키워드 목록은 suitable 인 분석의 키워드만 중복 없이 모은다")
+    void keywordVocabulary() {
+        List<String> vocabulary = analysisRepository.findDistinctKeywords();
+
+        assertThat(vocabulary).contains("VMware", "Broadcom", "pgvector", "HNSW").doesNotHaveDuplicates();
+        assertThat(vocabulary).as("suitable=false 인 행에만 있는 키워드").doesNotContain("cloud poetry");
     }
 
     @Test

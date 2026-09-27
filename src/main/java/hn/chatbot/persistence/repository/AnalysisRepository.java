@@ -19,8 +19,8 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
     /**
      * 검색 계획 1 — 키워드 완전 일치.
      *
-     * 배열 겹침(&&)이라 형태소 분석이 필요 없다. 질의가 자연어 문장이면
-     * 대부분 0건이고, pgvector 나 VMware 같은 고유명사 질의에서 가장 정확하다.
+     * 배열 겹침(&&)이라 형태소 분석이 필요 없다. 넘기는 키워드는 저장된 표기 그대로다
+     * (KeywordArrayPlan 이 질문 안에서 찾아낸 것). 일치한 키워드가 많은 스토리가 앞에 온다.
      * techField · category 가 null 이면 그 축으로 거르지 않는다.
      */
     @Query(value = """
@@ -29,6 +29,11 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
             WHERE suitable AND keywords && CAST(:keywords AS text[])
               AND (CAST(:techField AS text) IS NULL OR tech_field = CAST(:techField AS text))
               AND (CAST(:category AS text) IS NULL OR category = CAST(:category AS text))
+            ORDER BY cardinality(ARRAY(
+                         SELECT unnest(keywords)
+                         INTERSECT
+                         SELECT unnest(CAST(:keywords AS text[])))) DESC,
+                     story_id
             LIMIT :limit
             """, nativeQuery = true)
     List<Long> searchByKeywords(@Param("keywords") String[] keywords,
@@ -85,6 +90,15 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
             WHERE a.suitable
             """, nativeQuery = true)
     int countDistinctKeywords();
+
+    /** 검색 계획 1 이 질문 안에서 찾을 키워드 목록. 적합 판정된 분석의 키워드를 중복 없이 모은다. */
+    @Query(value = """
+            SELECT DISTINCT k
+            FROM analysis a, unnest(a.keywords) AS k
+            WHERE a.suitable
+            ORDER BY k
+            """, nativeQuery = true)
+    List<String> findDistinctKeywords();
 
     /**
      * 클러스터별 스토리 목록. recent 가 true 면 최신순, 아니면 점수순이다.
