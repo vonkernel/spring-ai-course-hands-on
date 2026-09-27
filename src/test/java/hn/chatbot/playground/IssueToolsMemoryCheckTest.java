@@ -1,6 +1,5 @@
 package hn.chatbot.playground;
 
-import hn.chatbot.search.SearchContext;
 import hn.chatbot.service.chat.ChatTurn;
 import hn.chatbot.service.chat.IssueTools;
 import hn.chatbot.service.chat.SearchEvidence;
@@ -46,7 +45,7 @@ class IssueToolsMemoryCheckTest {
     private final ChatTurn turn = new ChatTurn();
     private final ToolContext ctx = new ToolContext(Map.of(
             ChatMemory.CONVERSATION_ID, conversationId, ChatTurn.KEY, turn,
-            SearchContext.USER_QUESTION, "코딩 에이전트의 한계가 뭐야?"));
+            IssueTools.USER_QUESTION, "코딩 에이전트의 한계가 뭐야?"));
 
     @BeforeEach
     void requireData() {

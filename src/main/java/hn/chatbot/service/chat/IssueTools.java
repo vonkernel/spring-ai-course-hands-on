@@ -42,6 +42,9 @@ import java.util.List;
 @Component
 public class IssueTools {
 
+    /** ToolContext 키. 모델이 다듬기 전의 사용자 원문. 도구를 등록하는 쪽이 넣고 searchIssues 가 읽는다. */
+    public static final String USER_QUESTION = "userQuestion";
+
     private final SearchService searchService;
     private final RelevancePostProcessor relevancePostProcessor;
     private final TopicService topicService;
@@ -66,7 +69,7 @@ public class IssueTools {
      * 흐름
      *
      * 1 SearchContext.query 로 Query 를 만든다. 검색어는 query 인자, 필터는 techField · category,
-     *   사용자 원문은 ctx 의 SearchContext.USER_QUESTION 이다. 원문은 계획 1 이 쓴다.
+     *   사용자 원문은 ctx 의 USER_QUESTION 이다. 원문은 계획 1 이 쓴다.
      *   모델이 다듬은 검색어에는 사용자가 쓴 키워드가 그대로 남지 않기 때문이다
      * 2 SearchService.retrieve 로 후보를 찾는다. 계획별 요약은 Query 의 컨텍스트에 기록된다
      * 3 RelevancePostProcessor.process 로 근거를 고른다
