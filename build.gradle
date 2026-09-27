@@ -41,8 +41,8 @@ dependencyManagement {
 }
 
 tasks.named('test') {
-    // playground 는 OPENAI_API_KEY 가 있어야 돌아간다. 기본 test 에 섞으면
-    // "안전 필터링 2건만 실패한다" 는 기준이 흐려지므로 빼 둔다.
+    // playground 는 OPENAI_API_KEY 가 있어야 돌아가고, 통과 여부가 아니라 출력한 값을
+    // 눈으로 보는 것이 목적이다. 기본 test 는 키 없이 전부 통과해야 하므로 빼 둔다.
     useJUnitPlatform { excludeTags 'playground' }
 }
 

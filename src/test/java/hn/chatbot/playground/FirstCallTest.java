@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 준비된 것이고, 실패하면 키나 Docker 문제이지 구현 문제가 아니다.
  *
  * 기본 ./gradlew test 에서는 빠진다. OPENAI_API_KEY 가 필요해서,
- * 함께 돌리면 「안전 필터링 2건만 실패한다」는 기준이 흐려지기 때문이다.
+ * 함께 돌리면 키 없이 전부 통과한다는 기준이 흐려지기 때문이다.
  *
  *   ./gradlew playground --tests '*FirstCallTest'
  */

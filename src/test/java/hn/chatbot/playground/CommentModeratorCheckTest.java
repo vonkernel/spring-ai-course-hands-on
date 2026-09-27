@@ -1,7 +1,11 @@
-package hn.chatbot.ai;
+package hn.chatbot.playground;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hn.chatbot.ai.CommentModerator;
+import hn.chatbot.ai.ModerationProperties;
+import hn.chatbot.ai.ModerationVerdict;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,15 +29,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  *   - hate 의도로 쓴 문장의 최고 점수 카테고리가 harassment 로 나온다.
  *       카테고리 경계가 직관과 다르다 — 우리가 harassment 계열을 제외한 이유다
  *
- * CommentModerator 가 비어 있는 초기 상태에서는 이 테스트가 실패한다.
+ * CommentModerator 가 비어 있는 동안에는 이 테스트가 실패한다.
  * 수강생이 구현을 채워 통과시킨다.
  *
  * app.moderation.enabled 를 켜서 띄운다. 애플리케이션 기본값은 꺼짐이고 그때는
  * DisabledCommentModerator 가 @Primary 로 올라가므로, 켜지 않으면 수강생이 채운
  * CommentModeratorShell 이 아니라 통과용 빈을 확인하게 된다.
+ *
+ *   ./gradlew playground --tests '*CommentModeratorCheckTest'
  */
+@Tag("playground")
 @SpringBootTest(properties = "app.moderation.enabled=true")
-class CommentModerationTest {
+class CommentModeratorCheckTest {
 
     record Fixture(String kind, String intended, String text,
                    boolean flagged, Map<String, Boolean> categories, Map<String, Double> scores) {

@@ -75,4 +75,5 @@ src/test/ (단, src/test/java/hn/chatbot/playground/ 는 예외)
 
 계층 규칙은 `LayeringTest` 가 강제한다. 규칙을 위반하면 테스트가 실패한다.
 
-`CommentModerationTest` 는 해당 구현을 채우기 전까지 실패한다. 정상이다.
+`./gradlew test` 는 키 없이 전부 통과해야 한다. 빈 구현은 `playground` 태그가 붙은
+확인 테스트로 확인한다. 구현을 채우기 전까지 실패하는 것이 정상이다.

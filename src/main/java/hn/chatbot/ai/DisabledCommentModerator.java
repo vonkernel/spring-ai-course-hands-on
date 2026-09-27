@@ -16,7 +16,7 @@ import java.util.Map;
  * 댓글 하나마다 호출하는 구조라 셋업을 병렬로 돌리면 가장 먼저 429 가 난다.
  * Spring AI 1.1.8 의 ModerationPrompt 는 문자열 하나만 담아 배치로 묶을 수도 없다.
  *
- * 세션 3 의 검열 실습은 이 설정과 무관하다. CommentModerationTest 가
+ * 세션 3 의 검열 실습은 이 설정과 무관하다. CommentModeratorCheckTest 가
  * app.moderation.enabled=true 로 띄워 CommentModeratorShell 을 직접 확인한다.
  */
 @Primary
