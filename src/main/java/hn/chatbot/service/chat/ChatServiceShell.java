@@ -15,6 +15,9 @@ import java.time.Duration;
  *
  * 수강생이 ChatService 를 구현한 뒤에는, 데이터가 없을 때 안내 문구를 같은 방식으로
  * 흘리는 것이 그 자리를 대신한다.
+ *
+ * 수강생이 두 단계에 걸쳐 채운다. 1단계는 RetrievalAugmentationAdvisor 로 질문마다 검색하는 RAG,
+ * 2단계는 도구와 대화 기억을 쓰는 에이전트다. 단계별 구성은 실습 프롬프트로 전달한다.
  */
 @Service
 public class ChatServiceShell implements ChatService {

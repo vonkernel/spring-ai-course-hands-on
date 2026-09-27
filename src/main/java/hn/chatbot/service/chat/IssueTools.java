@@ -75,7 +75,7 @@ public class IssueTools {
      * 6 ctx 의 conversationId 로 SearchRecord.of 문구를 AssistantMessage 로 기억에 기록한다
      * 7 SearchEvidence 를 돌려준다. 모델이 이것으로 답을 쓴다
      *
-     * 2 · 3 은 세션 5 에서 RetrievalAugmentationAdvisor 에 넘겼던 부품 그대로다.
+     * 2 · 3 은 ChatService 1단계에서 RetrievalAugmentationAdvisor 에 넘겼던 부품 그대로다.
      * 그때는 Advisor 가 질문마다 불렀고, 이제는 모델이 이 도구를 골랐을 때만 부른다.
      */
     public SearchEvidence searchIssues(String query, String techField, String category, ToolContext ctx) {
@@ -100,7 +100,9 @@ public class IssueTools {
      * 비면 모든 분야를 나열한다. 빈 문자열을 그대로 넘기면 「이름이 빈 분야」를 찾게 되므로
      * 없는 값으로 바꿔 넘긴다.
      *
-     * sortBy 는 SCORE(점수순) 또는 RECENT(최신순)다. 그 밖의 값이 오면 기본값으로 다룬다.
+     * sortBy 는 SCORE(점수순) 또는 RECENT(최신순)다. 비었거나 그 밖의 값이면 SCORE 로 다룬다.
+     *
+     * limit 은 비었거나 0 이하면 20, 50 을 넘으면 50 으로 자른다.
      *
      * 결과를 SearchRecord.ofStories 문구로 대화 기억에 기록한다.
      */
@@ -121,6 +123,8 @@ public class IssueTools {
      * 스토리의 실제 댓글을 가져온다. "방금 그 이슈 댓글 보여줘" 같은 후속 질문이 여기로 온다.
      *
      * 돌려주는 text 는 검열을 거쳐 마스킹된 값이다.
+     *
+     * limit 은 비었거나 0 이하면 5, 10 을 넘으면 10 으로 자른다.
      */
     public List<CommentView> getComments(long storyId, Integer limit) {
         throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");

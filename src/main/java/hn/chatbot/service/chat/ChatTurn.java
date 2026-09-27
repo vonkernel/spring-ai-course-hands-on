@@ -17,15 +17,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Q&A 한 턴 동안 화면으로 보낼 사건을 모으는 통로. 완성본이다.
  *
  * 사건은 plans → evidence → token 반복 → done 순서로 흐른다. 검색 결과(plans · evidence)가
- * 어디서 나오느냐는 세션마다 다르다.
+ * 어디서 나오느냐는 ChatService 단계마다 다르다.
  *
- * 세션 5 — RetrievalAugmentationAdvisor 가 검색한다. 검색 결과는 Advisor 가 요청 컨텍스트에
+ * 1단계: RetrievalAugmentationAdvisor 가 검색한다. 검색 결과는 Advisor 가 요청 컨텍스트에
  * 남기고, Spring AI 가 그 컨텍스트를 모든 응답 조각에 복사한다. streamWithEvidence 가 첫 조각의
  * 컨텍스트에서 꺼내 방출한다.
  *
  *   ChatService : return new ChatTurn().streamWithEvidence(chatClient.prompt()...stream().chatClientResponse());
  *
- * 세션 6 — searchIssues 도구가 검색한다. 도구의 반환값은 모델에게 가므로 ChatService 가 사건을
+ * 2단계: searchIssues 도구가 검색한다. 도구의 반환값은 모델에게 가므로 ChatService 가 사건을
  * 받을 다른 길이 없다. 이 객체를 toolContext 에 넣어 건넨다.
  *
  *   ChatService : ChatTurn turn = new ChatTurn();

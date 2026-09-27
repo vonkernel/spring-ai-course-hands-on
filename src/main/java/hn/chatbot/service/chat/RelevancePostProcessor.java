@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * 후보 중 질문에 실제로 답이 되는 것을 골라 근거로 만든다. Spring AI 의 DocumentPostProcessor 다.
  *
- * 세션 5 에서는 RetrievalAugmentationAdvisor 가 SearchService 로 찾은 후보를 넘겨 부르고,
- * 세션 6 에서는 searchIssues 가 SearchService.retrieve 다음에 직접 부른다.
+ * ChatService 1단계에서는 RetrievalAugmentationAdvisor 가 SearchService 로 찾은 후보를 넘겨 부르고,
+ * 2단계에서는 searchIssues 가 SearchService.retrieve 다음에 직접 부른다.
  *
  * 흐름
  *
@@ -24,7 +24,7 @@ import java.util.List;
  * 4 ChatQuery.storyDetails 로 고른 스토리의 상세를 가져온다
  * 5 EvidenceDocuments.evidence 로 근거 Document 를 만들어 돌려준다. 판단 순서가 곧 근거 카드 순서다
  *
- * 질문으로 쓰는 query 는 세션마다 다르다. Advisor 는 사용자 원래 질문을 넘기고,
+ * 질문으로 쓰는 query 는 부르는 쪽마다 다르다. Advisor 는 사용자 원래 질문을 넘기고,
  * searchIssues 는 모델이 다듬은 검색어를 넘긴다.
  *
  * 수강생이 채운다.

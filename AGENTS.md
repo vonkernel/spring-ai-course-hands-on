@@ -14,7 +14,7 @@ search/shell/             검색 서비스
 search/plan/              벡터 검색 계획 2개 (BodyVectorPlan · SummaryVectorPlan)
 service/chat/RelevancePostProcessor   근거 후처리
 service/chat/IssueTools   모델이 호출하는 도구 7종
-service/chat/ChatServiceShell   Q&A 연결 (세션 5 · 6 두 단계)
+service/chat/ChatServiceShell   Q&A 연결 (1단계 · 2단계)
 ```
 
 **각 클래스의 Javadoc 이 구현 명세다.** 입력과 반환값, 주의 사항이

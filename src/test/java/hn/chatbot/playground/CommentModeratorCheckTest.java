@@ -82,6 +82,9 @@ class CommentModeratorCheckTest {
 
         System.out.printf("%n30건 중 %d건이 임계값 %.2f 를 넘었다.%n",
                 flaggedCount, properties.threshold());
+        assertThat(flaggedCount)
+                .as("의도적으로 자극한 픽스처는 일부가 걸려야 한다. 0건이면 점수 키 표기가 설정과 다른지 확인한다")
+                .isPositive();
         System.out.println("의도한 카테고리와 최고 점수 카테고리가 어긋나는 건을 눈으로 확인한다.");
     }
 

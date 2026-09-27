@@ -19,8 +19,8 @@ import java.util.Map;
  * of 가 근거 Document 와 검색 컨텍스트를 합친다. 계획별 요약과 병합 건수는
  * SearchService 가 컨텍스트에 기록해 둔 값이다.
  *
- * 모델에게 가는 모양은 두 세션이 같다. 세션 6 에서는 searchIssues 가 이 레코드를 반환하고
- * Spring AI 가 JSON 으로 바꿔 모델에 넘긴다. 세션 5 에서는 RetrievalAugmentationAdvisor 의
+ * 모델에게 가는 모양은 ChatService 두 단계가 같다. 2단계에서는 searchIssues 가 이 레코드를 반환하고
+ * Spring AI 가 JSON 으로 바꿔 모델에 넘긴다. 1단계에서는 RetrievalAugmentationAdvisor 의
  * ContextualQueryAugmenter 가 format 으로 같은 JSON 을 만들어 질문에 붙인다.
  */
 public record SearchEvidence(List<PlanSummary> plans, int merged, List<Item> evidence) {
@@ -30,12 +30,12 @@ public record SearchEvidence(List<PlanSummary> plans, int merged, List<Item> evi
                        String practicalImplication, String passage) {
     }
 
-    /** 세션 6. searchIssues 가 Query 와 근거 Document 로 만든다. */
+    /** 2단계. searchIssues 가 Query 와 근거 Document 로 만든다. */
     public static SearchEvidence of(Query query, List<Document> evidence) {
         return of(query.context(), evidence);
     }
 
-    /** 세션 5. ChatTurn 이 응답 조각의 컨텍스트와 근거 Document 로 만든다. */
+    /** 1단계. ChatTurn 이 응답 조각의 컨텍스트와 근거 Document 로 만든다. */
     public static SearchEvidence of(Map<String, Object> context, List<Document> evidence) {
         return new SearchEvidence(SearchContext.planSummaries(context), SearchContext.merged(context),
                 items(evidence));

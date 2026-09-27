@@ -15,8 +15,12 @@ import java.util.List;
  * 키워드가 들어 있는지 보므로, 적게 뽑으면 그 계획이 0건 나는 빈도가 올라간다.
  *
  * 서술 필드(summary · communityReaction · practicalImplication · unsuitableReason)는 한국어로 받는다.
- * keywords 의 고유명사 · 제품명은 원문 표기 그대로 둔다(VMware, llama.cpp). 사용자가 쓴 표기로
- * 계획 1 이 찾기 때문이다. techField · category 는 허용값 목록의 표기 그대로다.
+ * keywords 의 고유명사 · 제품명은 원문 표기 그대로 두고(VMware, llama.cpp) 일반 개념어는 한국어로 쓴다.
+ * 사용자가 쓴 표기로 계획 1 이 찾기 때문이다. techField · category 는 허용값 목록의 표기 그대로다.
+ *
+ * summary 는 본문을 2~3문장으로 요약한다. communityReaction 은 최상위 댓글의 반응 경향이고,
+ * 댓글이 없으면 반응이 없다는 취지로 짧게 적는다. practicalImplication 은 실무자에게
+ * 주는 의미를 한두 문장으로 적는다.
  *
  * 구조화 출력은 값이 없는 String 필드에 null 이 아니라 빈 문자열을 채워 돌려준다.
  * analysis 에는 CHECK (suitable = (unsuitable_reason IS NULL)) 가 걸려 있어
