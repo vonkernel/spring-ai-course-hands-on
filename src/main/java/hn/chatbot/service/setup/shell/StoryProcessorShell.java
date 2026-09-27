@@ -1,59 +1,52 @@
 package hn.chatbot.service.setup.shell;
 
-import hn.chatbot.ai.ArticleBodyExtractor;
-import hn.chatbot.ai.ArticleChunker;
-import hn.chatbot.ai.CommentModerator;
-import hn.chatbot.ai.EmbeddingIndexer;
-import hn.chatbot.ai.HarmfulPhraseDetector;
-import hn.chatbot.ai.IssueAnalyzer;
 import hn.chatbot.service.setup.StageTracker;
+import hn.chatbot.service.setup.StoryExtractor;
+import hn.chatbot.service.setup.StoryLoader;
 import hn.chatbot.service.setup.StoryOutcome;
 import hn.chatbot.service.setup.StoryProcessor;
-import hn.chatbot.service.setup.port.ArticleSource;
-import hn.chatbot.service.setup.port.SetupQuery;
-import hn.chatbot.service.setup.port.SetupStore;
-import hn.chatbot.service.setup.port.StorySource;
+import hn.chatbot.service.setup.StoryTransformer;
+import hn.chatbot.service.setup.model.CollectedStory;
+import hn.chatbot.service.setup.model.TransformedStory;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
- * 스토리 하나를 2~8단계로 처리한다. 단계와 규칙은 StoryProcessor 의 Javadoc 에 있다.
+ * 스토리 하나를 2~8단계로 처리한다. 이름과 달리 완성본이다.
  *
- * 수강생이 채운다. 필요한 부품은 모두 주입돼 있다. 생성자 인자 순서가 곧 파이프라인 순서다.
- * 실행 · 진행 상황 · 로그는 완성본 PipelineSetupService 가 맡는다.
+ * 인덱싱 파이프라인의 E · T · L 을 담당 객체에 맡기고 차례로 부른다.
+ *
+ *   StoryExtractor   (E) 2 중복 확인, 스토리 · 댓글 수집
+ *   StoryTransformer (T) 3 검열 → 4 정제 → 5 본문 추출 → 6 분석 → 7 청킹
+ *   StoryLoader      (L) 8 저장 · 벡터 스토어 적재
+ *
+ * 모델 호출은 전부 실습에서 만든 부품 안에 있다. 부품이 아직 비어 있으면 그 부품이 던진
+ * UnsupportedOperationException 이 그대로 올라가고, 실행 뼈대가 진행 화면 시연으로 바꾼다.
  */
 @Component
 public class StoryProcessorShell implements StoryProcessor {
 
-    private final SetupQuery setupQuery;
-    private final StorySource storySource;
-    private final CommentModerator commentModerator;
-    private final HarmfulPhraseDetector harmfulPhraseDetector;
-    private final ArticleSource articleSource;
-    private final ArticleBodyExtractor articleBodyExtractor;
-    private final IssueAnalyzer issueAnalyzer;
-    private final ArticleChunker articleChunker;
-    private final EmbeddingIndexer embeddingIndexer;
-    private final SetupStore store;
+    private final StoryExtractor extractor;
+    private final StoryTransformer transformer;
+    private final StoryLoader loader;
 
-    public StoryProcessorShell(SetupQuery setupQuery, StorySource storySource,
-                               CommentModerator commentModerator, HarmfulPhraseDetector harmfulPhraseDetector,
-                               ArticleSource articleSource, ArticleBodyExtractor articleBodyExtractor,
-                               IssueAnalyzer issueAnalyzer, ArticleChunker articleChunker,
-                               EmbeddingIndexer embeddingIndexer, SetupStore store) {
-        this.setupQuery = setupQuery;
-        this.storySource = storySource;
-        this.commentModerator = commentModerator;
-        this.harmfulPhraseDetector = harmfulPhraseDetector;
-        this.articleSource = articleSource;
-        this.articleBodyExtractor = articleBodyExtractor;
-        this.issueAnalyzer = issueAnalyzer;
-        this.articleChunker = articleChunker;
-        this.embeddingIndexer = embeddingIndexer;
-        this.store = store;
+    public StoryProcessorShell(StoryExtractor extractor, StoryTransformer transformer, StoryLoader loader) {
+        this.extractor = extractor;
+        this.transformer = transformer;
+        this.loader = loader;
     }
 
     @Override
     public StoryOutcome process(long storyId, StageTracker tracker) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        Optional<CollectedStory> collected = extractor.extract(storyId, tracker);
+        if (collected.isEmpty()) {
+            return StoryOutcome.SKIPPED;
+        }
+
+        TransformedStory transformed = transformer.transform(collected.get(), tracker);
+        loader.load(transformed, tracker);
+
+        return transformed.indexable() ? StoryOutcome.COMPLETED : StoryOutcome.EXCLUDED;
     }
 }

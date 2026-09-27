@@ -14,7 +14,6 @@ search/shell/             검색 서비스
 search/plan/              벡터 검색 계획 2개 (BodyVectorPlan · SummaryVectorPlan)
 service/chat/RelevancePostProcessor   근거 후처리
 service/chat/IssueTools   모델이 호출하는 도구 7종
-service/setup/shell/      스토리 하나의 단계 처리 (StoryProcessorShell)
 service/chat/ChatServiceShell   Q&A 연결 (세션 5 · 6 두 단계)
 ```
 
@@ -71,6 +70,8 @@ service/*/model/  service/*/port/
 service/topic/DefaultTopicService   service/setup/AnalysisMapper
 service/chat/ChatTurn   service/chat/SearchEvidence   service/chat/SearchRecord   service/chat/EvidenceDocuments
 service/setup/PipelineSetupService   service/setup/StageTracker   service/setup/PipelinePolicy
+service/setup/StoryExtractor   service/setup/StoryTransformer   service/setup/StoryLoader
+service/setup/shell/StoryProcessorShell (이름과 달리 완성본)
 ai/*.java (shell/ 제외)   search/*.java (shell/ 제외)
 search/plan/KeywordArrayPlan   search/plan/FullTextPlan
 init/*.sql  frontend/  src/main/resources/static/

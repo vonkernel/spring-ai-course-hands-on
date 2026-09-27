@@ -94,7 +94,7 @@ class PipelineSetupServiceTest {
     }
 
     @Test
-    @DisplayName("StoryProcessor 가 비어 있으면 진행 화면 시연으로 끝까지 흐른다")
+    @DisplayName("부품이 비어 있으면 진행 화면 시연으로 끝까지 흐른다")
     void demoWhenNotImplemented() {
         StoryProcessor empty = (id, tracker) -> {
             throw new UnsupportedOperationException();

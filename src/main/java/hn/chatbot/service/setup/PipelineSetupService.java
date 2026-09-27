@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * 인기 스토리 목록을 받아 스토리마다 StoryProcessor 를 호출하고, 결과를 진행 상황으로 옮긴다.
  * 실행 스레드, 중복 실행 방지, 중지, 진행 상황 계산, 로그, SSE 발행을 맡는다.
- * 수강생이 구현하는 것은 StoryProcessor 하나다.
+ * StoryProcessor 도 완성본이다. 수강생은 그것이 부르는 부품(ai/)을 채운다.
  *
  * 스토리는 app.setup.concurrency 건씩 동시에 처리한다. 올리면 OpenAI 와 HN API 가
  * 429 로 거절한다. StoryProcessor 구현은 스토리 하나에만
@@ -52,8 +52,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Async 를 쓰지 않는다. 같은 빈 안에서 호출하면 프록시를 거치지 않아 동기로 실행되고,
  * 그러면 run 이 처리를 다 끝낸 뒤에야 응답해 409 판정도 무너진다.
  *
- * StoryProcessor 가 비어 있으면(UnsupportedOperationException) 진행 화면 시연으로 바꾼다.
- * DB 에는 아무것도 쓰지 않으므로 주제 탐색과 Q&A 탭은 잠긴 채다.
+ * 부품이 아직 비어 있으면(UnsupportedOperationException) 진행 화면 시연으로 바꾼다.
+ * 첫 예외가 나기 전에 함께 돌던 스토리는 실제로 수집되고, 4단계에서 제외된 것은 원본이 저장될 수 있다.
+ * 분석 행은 생기지 않으므로 주제 탐색과 Q&A 탭은 잠긴 채다.
  */
 @Service
 public class PipelineSetupService implements SetupService {
@@ -241,9 +242,9 @@ public class PipelineSetupService implements SetupService {
         publish();
     }
 
-    /** StoryProcessor 가 비어 있을 때 진행 화면만 보여 준다. DB 에는 쓰지 않는다. */
+    /** 부품이 비어 있을 때 진행 화면만 보여 준다. DB 에는 쓰지 않는다. */
     private void demo() {
-        addLog(LogKind.EXCLUDE, 0L, "StoryProcessor", "비어 있어 진행 화면만 보여 줍니다", LogState.WARN);
+        addLog(LogKind.EXCLUDE, 0L, "빈 구현", "채우지 않은 부품이 있어 진행 화면만 보여 줍니다", LogState.WARN);
         int t = target;
         try {
             for (int step = 2; step <= STAGE_NAMES.size(); step++) {
