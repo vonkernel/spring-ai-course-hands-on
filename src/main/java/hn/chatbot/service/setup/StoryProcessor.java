@@ -2,7 +2,7 @@ package hn.chatbot.service.setup;
 
 /**
  * 스토리 하나를 파이프라인 2~8단계로 처리한다. 뼈대(PipelineSetupService)가 스토리마다 호출한다.
- * 구현(StoryProcessorShell)은 완성본이다. 인덱싱 파이프라인의 E · T · L 을 세 객체에 나눠 맡긴다.
+ * 구현(DefaultStoryProcessor)은 완성본이다. 인덱싱 파이프라인의 E · T · L 을 세 객체에 나눠 맡긴다.
  *
  * 8단계
  *

@@ -1,4 +1,4 @@
-package hn.chatbot.service.setup.shell;
+package hn.chatbot.service.setup;
 
 import hn.chatbot.ai.EmbeddingIndexer;
 import hn.chatbot.ai.IssueAnalysis;
@@ -10,11 +10,6 @@ import hn.chatbot.domain.ArticleStatus;
 import hn.chatbot.domain.BodyChunk;
 import hn.chatbot.domain.Comment;
 import hn.chatbot.domain.Story;
-import hn.chatbot.service.setup.StageTracker;
-import hn.chatbot.service.setup.StoryExtractor;
-import hn.chatbot.service.setup.StoryLoader;
-import hn.chatbot.service.setup.StoryOutcome;
-import hn.chatbot.service.setup.StoryTransformer;
 import hn.chatbot.service.setup.model.CollectedComment;
 import hn.chatbot.service.setup.model.CollectedStory;
 import hn.chatbot.service.setup.model.Exclusions;
@@ -37,7 +32,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class StoryProcessorShellTest {
+class DefaultStoryProcessorTest {
 
     private static final String LONG_BODY = "Coding agents lose context on large refactors. ".repeat(80);
 
@@ -78,7 +73,7 @@ class StoryProcessorShellTest {
     @Test
     @DisplayName("끝까지 통과하면 원본과 분석 · 청크를 저장하고 벡터 스토어에 적재한다")
     void completes() {
-        StoryProcessorShell processor = processor(false, FetchOutcome.OK, SUITABLE);
+        DefaultStoryProcessor processor = processor(false, FetchOutcome.OK, SUITABLE);
 
         StoryOutcome outcome = processor.process(7L, tracker);
 
@@ -130,14 +125,14 @@ class StoryProcessorShellTest {
                     throw new UnsupportedOperationException();
                 },
                 (title, body, comments) -> SUITABLE, body -> List.of(body));
-        StoryProcessorShell processor = new StoryProcessorShell(
+        DefaultStoryProcessor processor = new DefaultStoryProcessor(
                 new StoryExtractor(query(false), source()), transformer, new StoryLoader(store, indexer));
 
         assertThatThrownBy(() -> processor.process(7L, tracker)).isInstanceOf(UnsupportedOperationException.class);
         assertThat(store.saved).isEmpty();
     }
 
-    private StoryProcessorShell processor(boolean processed, FetchOutcome fetch, IssueAnalysis analysis) {
+    private DefaultStoryProcessor processor(boolean processed, FetchOutcome fetch, IssueAnalysis analysis) {
         StoryTransformer transformer = new StoryTransformer(
                 text -> verdict(text.contains("bad")),
                 text -> new MaskingResult(List.of("bad")),
@@ -145,7 +140,7 @@ class StoryProcessorShellTest {
                 (title, text) -> Optional.of(text),
                 (title, body, comments) -> analysis,
                 body -> List.of(body.substring(0, 100), body.substring(100)));
-        return new StoryProcessorShell(new StoryExtractor(query(processed), source()), transformer,
+        return new DefaultStoryProcessor(new StoryExtractor(query(processed), source()), transformer,
                 new StoryLoader(store, indexer));
     }
 

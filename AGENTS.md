@@ -71,7 +71,7 @@ service/topic/DefaultTopicService   service/setup/AnalysisMapper
 service/chat/ChatTurn   service/chat/SearchEvidence   service/chat/SearchRecord   service/chat/EvidenceDocuments
 service/setup/PipelineSetupService   service/setup/StageTracker   service/setup/PipelinePolicy
 service/setup/StoryExtractor   service/setup/StoryTransformer   service/setup/StoryLoader
-service/setup/shell/StoryProcessorShell (이름과 달리 완성본)
+service/setup/DefaultStoryProcessor
 ai/*.java (shell/ 제외)   search/*.java (shell/ 제외)
 search/plan/KeywordArrayPlan   search/plan/FullTextPlan
 init/*.sql  frontend/  src/main/resources/static/
