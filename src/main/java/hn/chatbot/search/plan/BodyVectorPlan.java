@@ -1,11 +1,25 @@
 package hn.chatbot.search.plan;
 
+import hn.chatbot.search.PlanConditions;
+import hn.chatbot.search.PlanHit;
 import hn.chatbot.search.PlanRun;
+import hn.chatbot.search.SearchContext;
 import hn.chatbot.search.SearchPlan;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
+import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 검색 계획 3 — 원문 청크 벡터 검색.
@@ -30,6 +44,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class BodyVectorPlan implements SearchPlan {
 
+    /** 코사인 유사도 하한. */
+    private static final double SIMILARITY_THRESHOLD = 0.3;
+
+    /** 스토리 하나에 청크가 여럿이라, 스토리 limit 건을 채우려면 청크는 그보다 넉넉히 가져와야 한다. */
+    private static final int OVER_FETCH = 4;
+
     private final PgVectorStore vectorStore;
 
     public BodyVectorPlan(@Qualifier("bodyVectorStore") PgVectorStore vectorStore) {
@@ -48,6 +68,45 @@ public class BodyVectorPlan implements SearchPlan {
 
     @Override
     public PlanRun execute(Query query, int limit) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        String field = SearchContext.techField(query);
+        String type = SearchContext.category(query);
+        String condition = PlanConditions.vector(query.text(), field, type, limit);
+
+        DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
+                .vectorStore(vectorStore)
+                .topK(limit * OVER_FETCH)
+                .similarityThreshold(SIMILARITY_THRESHOLD)
+                .build();
+
+        Map<String, Object> context = new HashMap<>(query.context());
+        context.put(VectorStoreDocumentRetriever.FILTER_EXPRESSION, filter(field, type));
+        List<Document> documents = retriever.retrieve(query.mutate().context(context).build());
+
+        Map<Long, Double> closestPerStory = new LinkedHashMap<>();
+        for (Document document : documents) {
+            long storyId = ((Number) document.getMetadata().get("storyId")).longValue();
+            double distance = 1.0 - document.getScore();
+            closestPerStory.merge(storyId, distance, Math::min);
+        }
+
+        List<PlanHit> hits = closestPerStory.entrySet().stream()
+                .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+                .limit(limit)
+                .map(entry -> new PlanHit(entry.getKey(), entry.getValue()))
+                .toList();
+
+        return new PlanRun(hits, condition);
+    }
+
+    private static Filter.Expression filter(String techField, String category) {
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op expression = b.eq("suitable", true);
+        if (techField != null) {
+            expression = b.and(expression, b.eq("techField", techField));
+        }
+        if (category != null) {
+            expression = b.and(expression, b.eq("category", category));
+        }
+        return expression.build();
     }
 }
