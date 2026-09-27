@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  *
  * Spring AI 의 VectorStoreDocumentRetriever 로 검색한다. 주입된 벡터 스토어와 topK ·
  * similarityThreshold 로 만들고, retrieve(Query) 에 검색어를 넘긴다.
- * 설정값: topK 는 limit, similarityThreshold 는 0.5.
+ * 설정값: topK 는 limit, similarityThreshold 는 0.3.
  *
  * PlanHit 의 score 는 코사인 거리다(1 - Document.getScore()). 스토리 id 는 metadata 의
  * storyId 를 Number 로 받아 longValue() 로 읽는다. JSONB 에서 되읽으면 Integer 로 올 수 있다.
