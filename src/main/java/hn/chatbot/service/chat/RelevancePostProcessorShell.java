@@ -1,12 +1,14 @@
 package hn.chatbot.service.chat;
 
 import hn.chatbot.ai.RelevanceJudge;
+import hn.chatbot.ai.RelevantStory;
 import hn.chatbot.service.chat.port.ChatQuery;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 후보를 RelevanceJudge 로 판단해 근거 Document 로 만든다.
@@ -35,6 +37,15 @@ public class RelevancePostProcessorShell implements RelevancePostProcessor {
 
     @Override
     public List<Document> process(Query query, List<Document> documents) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        if (documents.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, String> excerpts = chatQuery.bodyExcerpts(EvidenceDocuments.storyIds(documents));
+        List<RelevantStory> judged = relevanceJudge.selectRelevant(
+                query.text(), EvidenceDocuments.targets(documents, excerpts), EVIDENCE_MAX);
+
+        List<StoryDetail> details = chatQuery.storyDetails(judged.stream().map(RelevantStory::storyId).toList());
+        return EvidenceDocuments.evidence(documents, judged, details, excerpts);
     }
 }
