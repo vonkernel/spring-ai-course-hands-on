@@ -1,11 +1,23 @@
 package hn.chatbot.search.plan;
 
+import hn.chatbot.search.PlanConditions;
+import hn.chatbot.search.PlanHit;
 import hn.chatbot.search.PlanRun;
+import hn.chatbot.search.SearchContext;
 import hn.chatbot.search.SearchPlan;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
+import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 검색 계획 4 — 요약 벡터 검색.
@@ -28,6 +40,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SummaryVectorPlan implements SearchPlan {
 
+    /** 코사인 유사도 하한. */
+    private static final double SIMILARITY_THRESHOLD = 0.3;
+
     private final PgVectorStore vectorStore;
 
     public SummaryVectorPlan(@Qualifier("summaryVectorStore") PgVectorStore vectorStore) {
@@ -46,6 +61,38 @@ public class SummaryVectorPlan implements SearchPlan {
 
     @Override
     public PlanRun execute(Query query, int limit) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        String field = SearchContext.techField(query);
+        String type = SearchContext.category(query);
+        String condition = PlanConditions.vector(query.text(), field, type, limit);
+
+        DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
+                .vectorStore(vectorStore)
+                .topK(limit)
+                .similarityThreshold(SIMILARITY_THRESHOLD)
+                .build();
+
+        Map<String, Object> context = new HashMap<>(query.context());
+        context.put(VectorStoreDocumentRetriever.FILTER_EXPRESSION, filter(field, type));
+        List<Document> documents = retriever.retrieve(query.mutate().context(context).build());
+
+        List<PlanHit> hits = documents.stream()
+                .map(document -> new PlanHit(
+                        ((Number) document.getMetadata().get("storyId")).longValue(),
+                        1.0 - document.getScore()))
+                .toList();
+
+        return new PlanRun(hits, condition);
+    }
+
+    private static Filter.Expression filter(String techField, String category) {
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op expression = b.eq("suitable", true);
+        if (techField != null) {
+            expression = b.and(expression, b.eq("techField", techField));
+        }
+        if (category != null) {
+            expression = b.and(expression, b.eq("category", category));
+        }
+        return expression.build();
     }
 }
