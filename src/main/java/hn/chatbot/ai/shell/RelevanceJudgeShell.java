@@ -12,7 +12,7 @@ import java.util.List;
  * 후보 중 질의에 실제로 답이 되는 것을 고르고, 근거 대목을 뽑는다.
  * 계약은 RelevanceJudge 의 Javadoc 에 있다.
  *
- * 수강생이 채운다. ChatClient 는 주입돼 있다. 결과는 구조화 출력으로 받는다.
+ * ChatClient 는 주입돼 있다. 결과는 구조화 출력으로 받는다.
  */
 @Component
 public class RelevanceJudgeShell implements RelevanceJudge {

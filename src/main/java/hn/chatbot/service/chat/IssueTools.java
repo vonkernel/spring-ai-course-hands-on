@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 모델이 호출하는 도구 7종. 수강생이 채운다.
+ * 모델이 호출하는 도구 7종.
  *
  * 도구 등록(@Tool · @ToolParam)과 인자 검증이 구현 대상이다. 설명 문구가 곧 모델의
  * 선택 기준이므로 언제 쓰고 언제 쓰지 않는지를 적는다.

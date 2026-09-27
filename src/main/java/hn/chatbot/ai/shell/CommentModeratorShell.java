@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * 임계값과 비교한다. harassment 계열은 뺀다 — 기술 커뮤니티의 제품·기업 비판이 대량으로 걸린다.
  * 카테고리 목록과 임계값은 application.yml 에서 주입된다.
  *
- * 수강생이 채운다. CommentModeratorCheckTest 로 확인한다.
+ * CommentModeratorCheckTest 로 확인한다.
  */
 @Component
 public class CommentModeratorShell implements CommentModerator {

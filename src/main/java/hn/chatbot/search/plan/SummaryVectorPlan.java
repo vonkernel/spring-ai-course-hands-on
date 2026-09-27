@@ -24,8 +24,6 @@ import org.springframework.stereotype.Component;
  * 두 값은 SearchContext.techField · SearchContext.category 로 읽는다. 빈 문자열은 이미 null 로 바뀌어 있다.
  *
  * 결과와 함께 실행한 조건을 돌려준다. 조건 문자열은 PlanConditions.vector 로 만든다.
- *
- * 수강생이 채운다.
  */
 @Component
 public class SummaryVectorPlan implements SearchPlan {

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 7단계 — 문단 단위로 청킹한다. 경계가 식별되지 않거나 한 문단이 지나치게 길면 하드 리밋으로 나눈다.
  *
- * 수강생이 채운다. 순수 텍스트 분할이라 모델 호출이 필요 없다.
+ * 순수 텍스트 분할이라 모델 호출이 필요 없다.
  */
 @Component
 public class ArticleChunkerShell implements ArticleChunker {

@@ -22,7 +22,7 @@ import java.util.List;
  * StoryIndexQuery.hydrate 로 제목과 요약을 채워 후보를 만들고, 후보마다 찾아낸 계획 번호를 기록한다.
  * 후보는 Candidate.toDocument 로 Document 로 바꿔 돌려준다.
  *
- * 수강생이 채운다. 계획 4개와 색인 조회가 주입돼 있다.
+ * 계획 4개와 색인 조회가 주입돼 있다.
  */
 @Service
 public class SearchServiceShell implements SearchService {

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 /**
  * 3단계 — 검열에 걸린 댓글에서 유해 구간만 추출한다. 원문을 다시 쓰게 하면 내용이 변조되므로 치환할 구간만 받는다.
  *
- * 수강생이 채운다. ChatClient 는 주입돼 있다.
+ * ChatClient 는 주입돼 있다.
  */
 @Component
 public class HarmfulPhraseDetectorShell implements HarmfulPhraseDetector {

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 6단계 — 구조화 출력으로 분석 결과를 받는다. techField 와 category 의 값 목록을 프롬프트에 반드시 넣는다.
  *
- * 수강생이 채운다. ChatClient 는 주입돼 있다.
+ * ChatClient 는 주입돼 있다.
  */
 @Component
 public class IssueAnalyzerShell implements IssueAnalyzer {

@@ -17,8 +17,6 @@ import java.util.List;
  * 메타데이터 키는 storyId · suitable · techField · category 이고, 두 스토어에 모두 넣는다.
  * chunkSeq 는 본문 스토어에만 넣는다. storyId 로 검색 결과를 스토리 단위로 되묶고,
  * 나머지는 필터 조건으로 쓴다.
- *
- * 수강생이 채운다.
  */
 @Component
 public class EmbeddingIndexerShell implements EmbeddingIndexer {

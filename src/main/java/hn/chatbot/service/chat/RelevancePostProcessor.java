@@ -26,8 +26,6 @@ import java.util.List;
  *
  * 질문으로 쓰는 query 는 부르는 쪽마다 다르다. Advisor 는 사용자 원래 질문을 넘기고,
  * searchIssues 는 모델이 다듬은 검색어를 넘긴다.
- *
- * 수강생이 채운다.
  */
 @Component
 public class RelevancePostProcessor implements DocumentPostProcessor {

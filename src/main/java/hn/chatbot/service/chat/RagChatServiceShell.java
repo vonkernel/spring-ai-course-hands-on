@@ -22,9 +22,7 @@ import java.time.Duration;
  *   그 번호가 SearchEvidence.Item.rank 이고 화면의 근거 카드 순서와 같다
  * - 질문과 같은 언어로 답한다
  *
- * 빈 구현이다. Q&A 탭은 잠그지 않는다. 어떤 질문이 들어와도 안내 문구를 token 으로 나눠 흘린다.
- * 채팅 창에서 글자가 하나씩 채워지므로 스트리밍 경로 전체가 처음부터 살아 있음을 확인할 수 있다.
- * 구현한 뒤에는 적재된 데이터가 없을 때 같은 방식으로 안내 문구를 흘린다.
+ * 적재된 데이터가 없으면 모델을 부르지 않고 안내 문구를 token 으로 나눠 흘린다.
  */
 @Service
 public class RagChatServiceShell implements ChatService {
@@ -34,6 +32,8 @@ public class RagChatServiceShell implements ChatService {
 
     @Override
     public Flux<ChatEvent> chat(String conversationId, String question) {
+        // 빈 구현. Q&A 탭을 잠그지 않고 어떤 질문에도 안내 문구를 token 으로 나눠 흘린다.
+        // 채팅 창에서 글자가 하나씩 채워지므로 스트리밍 경로 전체가 처음부터 살아 있음을 확인할 수 있다.
         Flux<ChatEvent> tokens = Flux.fromArray(MESSAGE.split(""))
                 .delayElements(Duration.ofMillis(40))
                 .map(ChatEvent.Token::new)
