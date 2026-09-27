@@ -26,6 +26,8 @@ dependencies {
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
     implementation 'org.springframework.ai:spring-ai-starter-vector-store-pgvector'
     implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc'
+    // RetrievalAugmentationAdvisor · DocumentRetriever · DocumentPostProcessor. 스타터에 들어 있지 않다.
+    implementation 'org.springframework.ai:spring-ai-rag'
 
     // Spring Boot BOM 은 jsoup 을 관리하지 않는다. 버전을 직접 고정한다.
     implementation 'org.jsoup:jsoup:1.23.2'

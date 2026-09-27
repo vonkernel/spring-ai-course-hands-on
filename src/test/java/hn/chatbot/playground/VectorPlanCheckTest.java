@@ -2,6 +2,7 @@ package hn.chatbot.playground;
 
 import hn.chatbot.search.PlanHit;
 import hn.chatbot.search.PlanRun;
+import hn.chatbot.search.SearchContext;
 import hn.chatbot.search.plan.BodyVectorPlan;
 import hn.chatbot.search.plan.SummaryVectorPlan;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,7 @@ class VectorPlanCheckTest {
     @Test
     @DisplayName("본문 청크 검색은 스토리 단위로 묶어 돌려준다")
     void bodyPlan() {
-        PlanRun run = bodyPlan.execute(QUERY, null, null, 5);
+        PlanRun run = bodyPlan.execute(SearchContext.query(QUERY, null, null, null), 5);
         List<PlanHit> hits = run.hits();
         print("계획 3 " + bodyPlan.name(), run);
 
@@ -50,7 +51,7 @@ class VectorPlanCheckTest {
     @Test
     @DisplayName("요약 검색은 상위 결과를 돌려준다")
     void summaryPlan() {
-        PlanRun run = summaryPlan.execute(QUERY, null, null, 5);
+        PlanRun run = summaryPlan.execute(SearchContext.query(QUERY, null, null, null), 5);
         List<PlanHit> hits = run.hits();
         print("계획 4 " + summaryPlan.name(), run);
 
@@ -68,7 +69,7 @@ class VectorPlanCheckTest {
                 GROUP BY tech_field ORDER BY count(*) DESC LIMIT 1
                 """, String.class);
 
-        PlanRun run = summaryPlan.execute(QUERY, techField, "", 5);
+        PlanRun run = summaryPlan.execute(SearchContext.query(QUERY, null, techField, ""), 5);
         List<PlanHit> hits = run.hits();
         print("계획 4, techField=" + techField, run);
 
@@ -89,7 +90,7 @@ class VectorPlanCheckTest {
                 GROUP BY category ORDER BY count(*) DESC LIMIT 1
                 """, String.class);
 
-        PlanRun run = bodyPlan.execute(QUERY, null, category, 5);
+        PlanRun run = bodyPlan.execute(SearchContext.query(QUERY, null, null, category), 5);
         print("계획 3, category=" + category, run);
 
         assertThat(run.hits()).as("가장 많은 원문 타입으로 걸렀으므로 결과가 있어야 한다").isNotEmpty();
