@@ -19,7 +19,8 @@ export default function ChatTab() {
   // 후속 질문("방금 그 이슈")이 무엇을 가리키는지 눈으로 따라갈 수 있다.
   const [turns, setTurns] = useState([])
   const [busy, setBusy] = useState(false)
-  const endRef = useRef(null)
+  // 마지막 턴의 질문. 새 턴을 보낼 때 이 질문을 화면 위쪽에 맞춘다.
+  const lastAskRef = useRef(null)
 
   const last = turns[turns.length - 1]
 
@@ -31,7 +32,9 @@ export default function ChatTab() {
     setQuestion('')
   }
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [turns])
+  // 턴이 새로 생길 때만 스크롤한다. token 마다 맨 아래로 내리면 사용자가 올려 둔 위치를 빼앗고,
+  // 맨 아래는 근거 카드라 생성 중인 답변도 보이지 않는다. 질문을 위쪽에 두면 답변이 그 아래에서 자란다.
+  useEffect(() => { lastAskRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }, [turns.length])
 
   async function submit(e) {
     e.preventDefault()
@@ -100,7 +103,7 @@ export default function ChatTab() {
 
           {turns.map((t, i) => (
             <div key={i} style={{ marginBottom: 18 }}>
-              <div className="ask">{t.q}</div>
+              <div className="ask" ref={i === turns.length - 1 ? lastAskRef : null}>{t.q}</div>
               <div className="answer">
                 <div className="answer-head">
                   <span className="logo">Y</span>
@@ -118,7 +121,6 @@ export default function ChatTab() {
               </div>
             </div>
           ))}
-          <div ref={endRef} />
         </div>
 
         {/* 입력창은 항상 살아 있다. 데이터가 없으면 서버가 안내 문구를 스트림으로 흘린다. */}

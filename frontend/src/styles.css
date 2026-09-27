@@ -191,7 +191,7 @@ body {
 .thread { display: flex; flex-direction: column; overflow: hidden; }
 .messages { flex: 1; overflow-y: auto; padding: 24px; }
 .ask { background: #16181d; color: #fff; border-radius: 10px; padding: 12px 18px;
-  max-width: 70%; margin-left: auto; margin-bottom: 18px; }
+  max-width: 70%; margin-left: auto; margin-bottom: 18px; scroll-margin-top: 24px; }
 .answer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 .answer-head { display: flex; align-items: center; gap: 10px; font-weight: 700; margin-bottom: 12px; }
 .answer-head .logo { width: 24px; height: 24px; border-radius: 6px; background: var(--accent);
