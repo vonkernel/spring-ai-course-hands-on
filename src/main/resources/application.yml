@@ -25,6 +25,10 @@ spring:
           # 호출부에서 OpenAiChatOptions 를 새로 만들면 이 값이 덮이니 주의한다.
           reasoning-effort: none
       embedding:
+        # 기본값 EMBED 는 Document 의 metadata(storyId · suitable · techField · category · chunkSeq)를
+        # 본문 앞에 붙여 임베딩한다. 검색어는 본문만 임베딩하므로 같은 글끼리도 유사도가 낮아진다.
+        # 본문만 임베딩하게 한다. metadata 는 필터로만 쓴다.
+        metadata-mode: NONE
         options:
           model: text-embedding-3-small
       moderation:
