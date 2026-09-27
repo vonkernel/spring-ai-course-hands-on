@@ -75,7 +75,7 @@ public class IssueTools {
      * 6 ctx 의 conversationId 로 SearchRecord.of 문구를 AssistantMessage 로 기억에 기록한다
      * 7 SearchEvidence 를 돌려준다. 모델이 이것으로 답을 쓴다
      *
-     * 2 · 3 은 ChatService 1단계에서 RetrievalAugmentationAdvisor 에 넘겼던 부품 그대로다.
+     * 2 · 3 은 RagChatServiceShell 이 RetrievalAugmentationAdvisor 에 넘기는 부품 그대로다.
      * 그때는 Advisor 가 질문마다 불렀고, 이제는 모델이 이 도구를 골랐을 때만 부른다.
      */
     public SearchEvidence searchIssues(String query, String techField, String category, ToolContext ctx) {

@@ -9,12 +9,13 @@ Spring AI 실습 프로젝트. Hacker News 의 기술 이슈를 수집해 AI 로
 ## 빈 구현 위치
 
 ```
-ai/shell/                 LLM · Moderation 호출 9개
+ai/shell/                 LLM · Moderation 호출 8개
 search/shell/             검색 서비스
 search/plan/              벡터 검색 계획 2개 (BodyVectorPlan · SummaryVectorPlan)
 service/chat/RelevancePostProcessor   근거 후처리
 service/chat/IssueTools   모델이 호출하는 도구 7종
-service/chat/ChatServiceShell   Q&A 연결 (1단계 · 2단계)
+service/chat/RagChatServiceShell      Q&A 1단계: 질문마다 검색하는 RAG
+service/chat/AgentChatServiceShell    Q&A 2단계: 도구와 기억을 쓰는 에이전트
 ```
 
 **각 클래스의 Javadoc 이 구현 명세다.** 입력과 반환값, 주의 사항이
@@ -47,7 +48,7 @@ Javadoc 에 적혀 있다. 구현 전에 읽는다.
     근거 대목(`RelevanceJudge` 의 `passage`). 원문이 영어면 영어 그대로 둔다
   - 허용값 목록의 값: `techField` · `category`
   - `keywords` 의 고유명사 · 제품명 표기(`VMware`, `llama.cpp`). 검색 계획 1 이 사용자가 쓴 표기로 찾는다
-- Q&A 답변은 답변 규칙(`AnswerGenerator`)대로 질문과 같은 언어로 한다.
+- Q&A 답변은 질문과 같은 언어로 한다. `RagChatServiceShell` · `AgentChatServiceShell` 의 답변 규칙에 적는다.
 
 ## solution 브랜치 열람 금지
 

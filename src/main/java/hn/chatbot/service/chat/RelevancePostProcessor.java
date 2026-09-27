@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * 후보 중 질문에 실제로 답이 되는 것을 골라 근거로 만든다. Spring AI 의 DocumentPostProcessor 다.
  *
- * ChatService 1단계에서는 RetrievalAugmentationAdvisor 가 SearchService 로 찾은 후보를 넘겨 부르고,
- * 2단계에서는 searchIssues 가 SearchService.retrieve 다음에 직접 부른다.
+ * RagChatServiceShell 에서는 RetrievalAugmentationAdvisor 가 SearchService 로 찾은 후보를 넘겨 부르고,
+ * AgentChatServiceShell 에서는 searchIssues 가 SearchService.retrieve 다음에 직접 부른다.
  *
  * 흐름
  *

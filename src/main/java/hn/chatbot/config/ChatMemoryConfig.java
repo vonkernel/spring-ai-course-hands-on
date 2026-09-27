@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * 대화 기억에 직접 남기므로 한 턴에 쌓이는 메시지가 질문과 답변 두 개보다 많다.
  *
  * 이 빈을 선언하면 자동구성의 ChatMemory 는 물러선다. 쓰는 곳은 두 군데다.
- * ChatService 가 MessageChatMemoryAdvisor 에 넘기고, IssueTools 가 도구 결과를 add 한다.
+ * AgentChatServiceShell 이 MessageChatMemoryAdvisor 에 넘기고, IssueTools 가 도구 결과를 add 한다.
  */
 @Configuration
 public class ChatMemoryConfig {
