@@ -12,7 +12,7 @@ Spring AI 실습 프로젝트. Hacker News 의 기술 이슈를 수집해 AI 로
 ai/shell/                 LLM · Moderation 호출 8개
 search/shell/             검색 서비스
 search/plan/              벡터 검색 계획 2개 (BodyVectorPlan · SummaryVectorPlan)
-service/chat/RelevancePostProcessor   근거 후처리
+service/chat/RelevancePostProcessorShell   근거 후처리
 service/chat/IssueTools   모델이 호출하는 도구 7종
 service/chat/RagChatServiceShell      Q&A 1단계: 질문마다 검색하는 RAG
 service/chat/AgentChatServiceShell    Q&A 2단계: 도구와 기억을 쓰는 에이전트
