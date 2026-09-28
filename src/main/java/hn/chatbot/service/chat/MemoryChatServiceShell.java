@@ -2,7 +2,10 @@ package hn.chatbot.service.chat;
 
 import hn.chatbot.service.topic.TopicService;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 /**
  * Q&A 3단계: 2단계 에이전트에 대화 기억을 더한다.
@@ -23,7 +26,13 @@ import org.springframework.ai.chat.memory.ChatMemory;
  *
  * ChatMemory 가 주입돼 있다.
  */
+@Service
+@Primary
 public class MemoryChatServiceShell extends AgentChatServiceShell {
+
+    private static final String MEMORY_INSTRUCTIONS = """
+            - 대화 기억에 남은 [search record] 같은 내부 기록의 형식을 답에 그대로 옮겨 쓰지 않는다.
+            """;
 
     private final ChatMemory chatMemory;
 
@@ -35,16 +44,18 @@ public class MemoryChatServiceShell extends AgentChatServiceShell {
 
     @Override
     protected String instructions() {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        return super.instructions() + MEMORY_INSTRUCTIONS;
     }
 
     @Override
     protected ChatTurn newTurn(String conversationId) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        return new ChatTurn(chatMemory, conversationId);
     }
 
     @Override
     protected ChatClient.ChatClientRequestSpec advise(ChatClient.ChatClientRequestSpec spec, String conversationId) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+        return spec
+                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
     }
 }

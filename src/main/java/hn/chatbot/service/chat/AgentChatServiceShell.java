@@ -3,7 +3,6 @@ package hn.chatbot.service.chat;
 import hn.chatbot.service.chat.model.ChatEvent;
 import hn.chatbot.service.topic.TopicService;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -40,7 +39,6 @@ import java.util.Map;
  * ChatClient.Builder, StoryTools, TopicTools, TopicService 가 주입돼 있다.
  */
 @Service
-@Primary
 public class AgentChatServiceShell implements ChatService {
 
     private static final String NO_DATA_MESSAGE =
