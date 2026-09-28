@@ -10,10 +10,10 @@ import java.time.Duration;
  * Q&A 1단계: 질문마다 검색하는 RAG.
  *
  * RetrievalAugmentationAdvisor 가 질문마다 SearchService 로 검색하고, RelevancePostProcessor 로
- * 근거를 고른 뒤, 근거를 질문에 붙여 모델에 넘긴다. 답변 규칙은 system 프롬프트로 넣는다.
+ * 근거를 고른 뒤, 근거를 질문에 붙여 모델에 넘긴다. 답변 지시는 system 프롬프트로 넣는다.
  * 구성은 실습 프롬프트로 전달한다.
  *
- * 답변 규칙
+ * 답변 지시
  *
  * - 주어진 근거만으로 답한다. 근거에 없는 내용은 모른다고 한다
  * - 원문 타입(category)에 따라 서술 강도를 달리한다. 공식 발표와 개인 의견을 구분한다

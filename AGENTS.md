@@ -51,7 +51,7 @@ Javadoc 에 적혀 있다. 구현 전에 읽는다.
     근거 대목(`RelevanceJudge` 의 `passage`). 원문이 영어면 영어 그대로 둔다
   - 허용값 목록의 값: `techField` · `category`
   - `keywords` 의 고유명사 · 제품명 표기(`VMware`, `llama.cpp`). 검색 계획 1 이 사용자가 쓴 표기로 찾는다
-- Q&A 답변은 질문과 같은 언어로 한다. `RagChatServiceShell` · `AgentChatServiceShell` 의 답변 규칙에 적는다.
+- Q&A 답변은 질문과 같은 언어로 한다. `RagChatServiceShell` · `AgentChatServiceShell` 의 답변 지시에 적는다.
 
 ## solution 브랜치 열람 금지
 
