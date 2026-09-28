@@ -6,12 +6,15 @@ import hn.chatbot.service.setup.port.ArticleSource;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 /**
  * ArticleSource 포트의 HTTP 어댑터. 조회와 기계적 정제까지 맡는다.
@@ -24,6 +27,11 @@ import java.nio.charset.StandardCharsets;
  *
  * HTTP 상태 코드를 밖으로 내보내지 않는다. 서비스가 쓰는 것은 "받았나 · PDF 인가 ·
  * 실패했나" 셋뿐이고, 길이 판정은 수집처와 무관한 우리 정책이라 서비스가 한다.
+ *
+ * 이 클라이언트에만 연결 · 읽기 타임아웃을 둔다. 기본 설정에는 응답 타임아웃이 없어서
+ * 연결만 붙잡고 응답하지 않는 사이트를 만나면 셋업이 그 스토리에서 끝없이 멈춘다.
+ * 전역 설정(spring.http.client.*)으로 두지 않는 것은 같은 RestClient.Builder 를 쓰는
+ * OpenAI 호출까지 잘리기 때문이다.
  */
 @Component
 public class HttpArticleSource implements ArticleSource {
@@ -41,11 +49,19 @@ public class HttpArticleSource implements ArticleSource {
     /** doc.text() 가 공백을 뭉개므로 블록 경계에 표식을 심어 두고 나중에 줄바꿈으로 바꾼다. */
     private static final String NEWLINE_MARK = "@@NL@@";
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(15);
+
     private final RestClient client;
 
     public HttpArticleSource(RestClient.Builder builder,
                              @Value("${app.fetch.user-agent}") String userAgent) {
-        this.client = builder.defaultHeader("User-Agent", userAgent).build();
+        this.client = builder
+                .requestFactory(ClientHttpRequestFactoryBuilder.detect().build(ClientHttpRequestFactorySettings.defaults()
+                        .withConnectTimeout(CONNECT_TIMEOUT)
+                        .withReadTimeout(READ_TIMEOUT)))
+                .defaultHeader("User-Agent", userAgent)
+                .build();
     }
 
     @Override
