@@ -5,7 +5,7 @@
 -- 읽고 쓸 때마다 ::jsonb 로 캐스팅하므로, 처음부터 JSONB 면 그 캐스팅이
 -- 무연산이 되고 jsonb_path_ops GIN 인덱스를 걸 수 있다.
 --
--- 임베딩 모델은 text-embedding-3-small (1536차원).
+-- 임베딩 모델은 text-embedding-3-large, 1536차원으로 받는다.
 
 CREATE TABLE summary_vector_store (
     id        UUID  PRIMARY KEY,

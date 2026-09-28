@@ -24,7 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 public class VectorStoreConfig {
 
-    private static final int DIMENSIONS = 1536;   // text-embedding-3-small
+    private static final int DIMENSIONS = 1536;   // text-embedding-3-large 를 1536차원으로 받음
 
     @Bean
     public PgVectorStore summaryVectorStore(JdbcTemplate jdbcTemplate, EmbeddingModel embeddingModel) {

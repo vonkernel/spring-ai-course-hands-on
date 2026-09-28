@@ -30,7 +30,9 @@ spring:
         # 본문만 임베딩하게 한다. metadata 는 필터로만 쓴다.
         metadata-mode: NONE
         options:
-          model: text-embedding-3-small
+          model: text-embedding-3-large
+          # 테이블 VECTOR(1536) 과 HNSW 인덱스의 차원 한도에 맞춰 1536차원으로 줄여 받는다.
+          dimensions: 1536
       moderation:
         options:
           # options 를 빠뜨리면 바인딩되지 않는다. 오류 없이 무시되고 기본 모델로 돈다.
