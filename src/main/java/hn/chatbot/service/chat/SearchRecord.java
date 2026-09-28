@@ -23,7 +23,7 @@ public final class SearchRecord {
     private SearchRecord() {
     }
 
-    /** searchIssues 용. 검색 조건, 계획별 건수, 근거 목록. */
+    /** searchStories 용. 검색 조건, 계획별 건수, 근거 목록. */
     public static String of(String query, String techField, String category, SearchEvidence evidence) {
         String plans = evidence.plans().stream()
                 .map(p -> String.valueOf(p.hits()))

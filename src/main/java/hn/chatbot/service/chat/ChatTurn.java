@@ -30,14 +30,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  *   ChatService : return new ChatTurn().streamWithEvidence(chatClient.prompt()...stream().chatClientResponse());
  *
- * 2단계 AgentChatServiceShell: searchIssues 도구가 검색한다. 도구의 반환값은 모델에게 가므로 ChatService 가 사건을
+ * 2단계 AgentChatServiceShell: searchStories 도구가 검색한다. 도구의 반환값은 모델에게 가므로 ChatService 가 사건을
  * 받을 다른 길이 없다. 이 객체를 toolContext 에 넣어 건넨다.
  *
- *   ChatService : ChatTurn turn = new ChatTurn();
- *                 .toolContext(Map.of(ChatTurn.KEY, turn, ...))
- *                 return turn.stream(모델의 token 흐름);
- *   searchIssues: ChatTurn.from(ctx).publish(search, evidence);
- *   listStories : ChatTurn.from(ctx).publishStories(techField, sortBy, stories);
+ *   ChatService   : ChatTurn turn = new ChatTurn();
+ *                   .toolContext(Map.of(ChatTurn.KEY, turn, ...))
+ *                   return turn.stream(모델의 token 흐름);
+ *   searchStories : ChatTurn.from(ctx).publish(search, evidence);
+ *   listStories   : ChatTurn.from(ctx).publishStories(techField, sortBy, stories);
  *
  * 대화 기억: 도구 호출의 중간 메시지는 기억 Advisor 가 저장하지 않는다. 후속 질문에 필요한 번호와
  * storyId 는 도구 결과에만 있으므로, 기억을 받아 만든 ChatTurn 은 도구가 넘긴 결과를 SearchRecord 문구로
@@ -75,7 +75,7 @@ public final class ChatTurn {
     }
 
     /**
-     * searchIssues 의 결과를 받는다. plans · evidence 사건으로 방출하고,
+     * searchStories 의 결과를 받는다. plans · evidence 사건으로 방출하고,
      * 기억이 있으면 검색 조건과 근거 목록을 SearchRecord.of 문구로 기록한다.
      */
     public void publish(Query search, SearchEvidence evidence) {

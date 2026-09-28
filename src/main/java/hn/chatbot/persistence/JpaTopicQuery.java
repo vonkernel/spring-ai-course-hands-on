@@ -61,8 +61,9 @@ public class JpaTopicQuery implements TopicQuery {
     }
 
     @Override
-    public int count(String techField, String category) {
-        return analyses.countSuitable(blankToNull(techField), blankToNull(category));
+    public int count(String techField) {
+        String value = blankToNull(techField);
+        return value == null ? analyses.countSuitable() : analyses.countSuitableByTechField(value);
     }
 
     private static String blankToNull(String value) {

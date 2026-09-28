@@ -53,7 +53,7 @@ public class DefaultTopicService implements TopicService {
     }
 
     @Override
-    public int count(String techField, String category) {
-        return topicQuery.count(techField, category);
+    public int count(String techField) {
+        return topicQuery.count(techField);
     }
 }

@@ -27,9 +27,9 @@ public class MemoryChatServiceShell extends AgentChatServiceShell {
 
     private final ChatMemory chatMemory;
 
-    public MemoryChatServiceShell(ChatClient.Builder builder, IssueTools issueTools, TopicService topicService,
-                                  ChatMemory chatMemory) {
-        super(builder, issueTools, topicService);
+    public MemoryChatServiceShell(ChatClient.Builder builder, StoryTools storyTools, TopicTools topicTools,
+                                  TopicService topicService, ChatMemory chatMemory) {
+        super(builder, storyTools, topicTools, topicService);
         this.chatMemory = chatMemory;
     }
 

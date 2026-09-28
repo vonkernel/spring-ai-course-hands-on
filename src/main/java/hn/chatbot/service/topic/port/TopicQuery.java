@@ -17,8 +17,8 @@ public interface TopicQuery {
 
     int countByTechField(String techField);
 
-    /** 적합 스토리 건수. null 인 인자는 조건에서 제외한다. */
-    int count(String techField, String category);
+    /** 기술 분야의 적합 스토리 건수. null 이거나 빈 값이면 전체 건수다. */
+    int count(String techField);
 
     enum StorySort {
         SCORE, RECENT

@@ -34,15 +34,11 @@ class RepositoryQueryTest {
 
     private int suitableBefore;
     private int aiBefore;
-    private int aiDeepBefore;
-    private int aiNewsBefore;
 
     @BeforeEach
     void seed() {
         suitableBefore = analysisRepository.countSuitable();
-        aiBefore = analysisRepository.countSuitable("AI_LLM", null);
-        aiDeepBefore = analysisRepository.countSuitable("AI_LLM", "TECHNICAL_DEEP_DIVE");
-        aiNewsBefore = analysisRepository.countSuitable("AI_LLM", "NEWS_REPORT");
+        aiBefore = analysisRepository.countSuitableByTechField("AI_LLM");
 
         em.persist(new Story(1L, "VMware licensing changes upset customers",
                 "https://example.com/vmware", "alice", 300, 120, null, Instant.now()));
@@ -137,12 +133,9 @@ class RepositoryQueryTest {
     }
 
     @Test
-    @DisplayName("countStories 용 건수 — 비운 축은 거르지 않는다")
-    void countByTechFieldAndCategory() {
-        assertThat(analysisRepository.countSuitable(null, null)).isEqualTo(suitableBefore + 2);
-        assertThat(analysisRepository.countSuitable("AI_LLM", null)).isEqualTo(aiBefore + 1);
-        assertThat(analysisRepository.countSuitable("AI_LLM", "TECHNICAL_DEEP_DIVE")).isEqualTo(aiDeepBefore + 1);
-        assertThat(analysisRepository.countSuitable("AI_LLM", "NEWS_REPORT")).isEqualTo(aiNewsBefore);
+    @DisplayName("countStories 용 분야별 건수")
+    void countByTechField() {
+        assertThat(analysisRepository.countSuitableByTechField("AI_LLM")).isEqualTo(aiBefore + 1);
     }
 
     @Test

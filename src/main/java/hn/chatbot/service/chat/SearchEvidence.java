@@ -19,7 +19,7 @@ import java.util.Map;
  * of 가 근거 Document 와 검색 컨텍스트를 합친다. 계획별 요약과 병합 건수는
  * SearchService 가 컨텍스트에 기록해 둔 값이다.
  *
- * 모델에게 가는 모양은 두 ChatService 구현이 같다. AgentChatServiceShell 에서는 searchIssues 가 이 레코드를
+ * 모델에게 가는 모양은 두 ChatService 구현이 같다. AgentChatServiceShell 에서는 searchStories 가 이 레코드를
  * 반환하고 Spring AI 가 JSON 으로 바꿔 모델에 넘긴다. RagChatServiceShell 에서는 RetrievalAugmentationAdvisor 의
  * ContextualQueryAugmenter 가 format 으로 같은 JSON 을 만들어 질문에 붙인다.
  */
@@ -30,7 +30,7 @@ public record SearchEvidence(List<PlanSummary> plans, int merged, List<Item> evi
                        String practicalImplication, String passage) {
     }
 
-    /** AgentChatServiceShell. searchIssues 가 Query 와 근거 Document 로 만든다. */
+    /** AgentChatServiceShell. searchStories 가 Query 와 근거 Document 로 만든다. */
     public static SearchEvidence of(Query query, List<Document> evidence) {
         return of(query.context(), evidence);
     }

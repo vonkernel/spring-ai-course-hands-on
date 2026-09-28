@@ -13,7 +13,7 @@ import org.springframework.ai.rag.Query;
  * SearchContext.category 로 읽는다. 계획 1 은 SearchContext.userQuestion 으로 사용자 원문을 읽는다.
  *
  * 필터: suitable 은 항상 건다. techField · category 는 값이 있을 때만 건다.
- * RetrievalAugmentationAdvisor 가 부를 때는 비어 있고, searchIssues 가 부를 때는 모델이 도구 인자로 채운다.
+ * RetrievalAugmentationAdvisor 가 부를 때는 비어 있고, searchStories 가 부를 때는 모델이 도구 인자로 채운다.
  *
  * 결과와 함께 실제로 실행한 조건을 돌려준다. 조건 문자열은 PlanConditions 로 만든다.
  */

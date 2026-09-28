@@ -63,16 +63,6 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
     @Query("SELECT count(a) FROM Analysis a WHERE a.suitable = true AND a.techField = :techField")
     int countSuitableByTechField(@Param("techField") String techField);
 
-    /** countStories 도구용 건수. techField · category 가 null 이면 그 축으로 거르지 않는다. */
-    @Query(value = """
-            SELECT count(*)
-            FROM analysis
-            WHERE suitable
-              AND (CAST(:techField AS text) IS NULL OR tech_field = CAST(:techField AS text))
-              AND (CAST(:category AS text) IS NULL OR category = CAST(:category AS text))
-            """, nativeQuery = true)
-    int countSuitable(@Param("techField") String techField, @Param("category") String category);
-
     /** 제외 사유별 집계. LLM 판정으로 걸러진 것만 대상이다. */
     @Query(value = """
             SELECT unsuitable_reason AS value, count(*) AS count

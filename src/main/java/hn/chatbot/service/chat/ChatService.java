@@ -10,12 +10,12 @@ import reactor.core.publisher.Flux;
  * ChatController 는 @Primary 가 붙은 구현을 주입받는다. 새 단계를 채우면 @Primary 를 그 구현으로 옮긴다.
  *
  * - 1단계 RagChatServiceShell: RetrievalAugmentationAdvisor 로 질문마다 검색하는 RAG
- * - 2단계 AgentChatServiceShell: 도구(IssueTools)를 쓰는 에이전트
+ * - 2단계 AgentChatServiceShell: 도구(StoryTools · TopicTools)를 쓰는 에이전트
  * - 3단계 MemoryChatServiceShell: AgentChatServiceShell 을 상속해 대화 기억을 더한 에이전트
  *
  * 공통
  *
- * - 적재된 스토리가 0건이면(TopicService.count(null, null)) 모델을 부르지 않는다.
+ * - 적재된 스토리가 0건이면(TopicService.count(null)) 모델을 부르지 않는다.
  *   안내 문구를 Token 으로 흘리고 Completed 로 닫는다
  * - 사건의 순서는 plans → evidence → token 반복 → done 이다. 화면이 이 순서대로 그린다.
  *   사건을 만드는 통로는 완성본 ChatTurn 이다

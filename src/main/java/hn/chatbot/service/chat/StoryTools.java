@@ -2,16 +2,14 @@ package hn.chatbot.service.chat;
 
 import hn.chatbot.search.SearchService;
 import hn.chatbot.service.chat.port.ChatQuery;
-import hn.chatbot.service.topic.TopicService;
-import hn.chatbot.service.topic.model.StorySummary;
-import hn.chatbot.service.topic.model.TopicDistribution;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
- * 모델이 호출하는 도구 7종.
+ * 모델이 호출하는 스토리 도구 3종. 질의로 스토리를 찾고, 스토리 한 건의 상세와 댓글을 가져온다.
+ * 분야 단위의 목록 · 건수 · 요약은 TopicTools 가 맡는다.
  *
  * 도구 등록(@Tool · @ToolParam)과 인자 검증이 구현 대상이다. 설명 문구가 곧 모델의
  * 선택 기준이므로 언제 쓰고 언제 쓰지 않는지를 적는다.
@@ -22,7 +20,7 @@ import java.util.List;
  * techField 와 category 는 ENUM 이 아니라 TEXT 다. 대소문자까지 정확히 일치해야 걸리는데
  * 모델은 허용값을 모른다. 목록을 @ToolParam 설명에 적지 않으면 「하드웨어」나 hardware 를
  * 넣고, 예외 없이 0건이 돌아와 그 결과를 근거로 그럴듯한 오답이 만들어진다.
- * 두 분류 모두 폴백으로 런타임에 새 값이 생기므로 「목록에 없으면 listTopics 로 확인」도 적는다.
+ * techField 는 폴백으로 런타임에 새 값이 생기므로 「목록에 없으면 listTopics 로 확인」도 적는다.
  *
  * techField 값: AI_LLM · SECURITY_PRIVACY · OPEN_SOURCE · INFRASTRUCTURE_ENTERPRISE ·
  * PLATFORM_POLICY · DEV_CULTURE_PRACTICE · HARDWARE · MOBILITY · NON_TECHNICAL
@@ -35,29 +33,26 @@ import java.util.List;
  *
  * ToolContext 를 받는 도구는 모든 호출이 .toolContext(...) 를 채워야 한다.
  * 빠뜨리면 모델을 호출하기도 전에 IllegalArgumentException 이 난다.
- * searchIssues · listStories 는 결과를 ChatTurn 에 넘긴다. 화면 전송과 기억 기록은 ChatTurn 이 맡는다.
+ * searchStories 는 결과를 ChatTurn 에 넘긴다. 화면 전송과 기억 기록은 ChatTurn 이 맡는다.
  */
 @Component
-public class IssueTools {
+public class StoryTools {
 
-    /** ToolContext 키. 모델이 다듬기 전의 사용자 원문. 도구를 등록하는 쪽이 넣고 searchIssues 가 읽는다. */
+    /** ToolContext 키. 모델이 다듬기 전의 사용자 원문. 도구를 등록하는 쪽이 넣고 searchStories 가 읽는다. */
     public static final String USER_QUESTION = "userQuestion";
 
     private final SearchService searchService;
     private final RelevancePostProcessor relevancePostProcessor;
-    private final TopicService topicService;
     private final ChatQuery chatQuery;
 
-    public IssueTools(SearchService searchService, RelevancePostProcessor relevancePostProcessor,
-                      TopicService topicService, ChatQuery chatQuery) {
+    public StoryTools(SearchService searchService, RelevancePostProcessor relevancePostProcessor, ChatQuery chatQuery) {
         this.searchService = searchService;
         this.relevancePostProcessor = relevancePostProcessor;
-        this.topicService = topicService;
         this.chatQuery = chatQuery;
     }
 
     /**
-     * 질의와 의미가 관련된 기술 이슈를 찾아 근거를 돌려준다. 개수를 세거나 목록을 나열할 때는 쓰지 않는다.
+     * 질의와 의미가 관련된 스토리를 찾아 근거를 돌려준다. 개수를 세거나 분야별 목록을 나열할 때는 쓰지 않는다.
      *
      * techField · category 는 선택이다. 모델이 질의를 보고 채운다("공식 발표만" → category).
      * 비우면 그 축으로 거르지 않는다. 허용값은 클래스 Javadoc 에 있고 설명 문구에 적는다.
@@ -76,35 +71,7 @@ public class IssueTools {
      * 2 · 3 은 RagChatServiceShell 이 RetrievalAugmentationAdvisor 에 넘기는 SearchService · RelevancePostProcessor 그대로다.
      * 그때는 Advisor 가 질문마다 불렀고, 이제는 모델이 이 도구를 골랐을 때만 부른다.
      */
-    public SearchEvidence searchIssues(String query, String techField, String category, ToolContext ctx) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
-    }
-
-    /**
-     * 기술 분야나 원문 타입별 이슈 건수를 센다. 벡터 검색으로는 할 수 없는 일이다.
-     *
-     * techField 와 category 의 허용값은 클래스 Javadoc 에 있고 설명 문구에 적는다.
-     *
-     * 두 인자 모두 선택이다. TopicService.count 에 그대로 넘기면 비운 축은 거르지 않는다.
-     */
-    public int countStories(String techField, String category) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
-    }
-
-    /**
-     * 특정 기술 분야의 이슈를 나열한다.
-     *
-     * techField 는 선택이다. 허용값은 클래스 Javadoc 에 있고 설명 문구에 적는다.
-     * 비면 모든 분야를 나열한다. 빈 문자열을 그대로 넘기면 「이름이 빈 분야」를 찾게 되므로
-     * 없는 값으로 바꿔 넘긴다.
-     *
-     * sortBy 는 SCORE(점수순) 또는 RECENT(최신순)다. 비었거나 그 밖의 값이면 SCORE 로 다룬다.
-     *
-     * limit 은 비었거나 0 이하면 20, 50 을 넘으면 50 으로 자른다.
-     *
-     * 결과를 ChatTurn.from(ctx).publishStories 로 넘긴다. sortBy 는 실제로 쓴 정렬 이름을 넘긴다.
-     */
-    public List<StorySummary> listStories(String techField, String sortBy, Integer limit, ToolContext ctx) {
+    public SearchEvidence searchStories(String query, String techField, String category, ToolContext ctx) {
         throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
     }
 
@@ -125,27 +92,6 @@ public class IssueTools {
      * limit 은 비었거나 0 이하면 5, 10 을 넘으면 10 으로 자른다.
      */
     public List<CommentView> getComments(long storyId, Integer limit) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
-    }
-
-    /**
-     * 수집된 이슈가 어떤 기술 분야와 원문 타입으로 나뉘는지 분포를 가져온다.
-     *
-     * TopicService 를 그대로 호출한다. 주제 탐색 탭과 모델이 같은 데이터를 본다.
-     */
-    public TopicDistribution listTopics() {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
-    }
-
-    /**
-     * 특정 기술 분야 전반의 논의 흐름을 요약한다. 개별 이슈를 찾을 때는 쓰지 않는다.
-     *
-     * techField 의 허용값은 클래스 Javadoc 에 있고 설명 문구에 적는다. 빈 문자열은
-     * 없는 값으로 바꿔 넘긴다.
-     *
-     * TopicService.summarize 에 위임한다. 그 안에서 TopicSummarizer 가 LLM 을 호출한다.
-     */
-    public String summarizeTopic(String techField) {
         throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
     }
 }
