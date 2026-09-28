@@ -23,10 +23,11 @@ import reactor.core.publisher.Flux;
  * 이 클래스의 instructions 는 답변 지시 상수를 돌려준다. newTurn 은 new ChatTurn() 을,
  * advise 는 받은 요청을 그대로 돌려준다.
  *
- * 답변 지시: RagChatServiceShell 의 지시에 다음을 더한다
+ * 답변 지시: RagChatServiceShell 의 지시를 바탕으로 근거 번호 항목을 바꾸고 다음을 더한다
  *
+ * - 근거 번호 항목: searchStories 결과의 근거를 쓸 때만 그 근거의 rank 를 [1] 처럼 표시한다.
+ *   번호는 화면의 근거 카드 번호와 같다. 목록 · 건수 · 요약 결과는 번호 없이 제목으로 가리킨다
  * - 검색 조건을 해석한다. 필터를 걸어 결과가 없으면 필터를 풀지 말고 그 사실을 말한다
- * - 근거 번호([1] 등)는 searchStories 로 받은 근거에만 붙인다. 목록 · 건수 · 요약 결과에는 붙이지 않는다
  *
  * @Service 와 @Primary 를 붙여 ChatController 가 RagChatServiceShell 대신 이 구현을 주입받게 한다.
  * 붙이기 전에는 빈(Bean)으로 등록되지 않으므로 Q&A 탭은 RagChatServiceShell 로 답한다.
