@@ -68,7 +68,7 @@ class PipelineSetupServiceTest {
     };
 
     @Test
-    @DisplayName("결과를 완료 · 제외 건수로 옮기고 단계 통과를 반영하며 항등식을 지킨다")
+    @DisplayName("결과를 완료 · 건너뜀 · 제외 건수로 옮기고 단계 통과를 반영하며 항등식을 지킨다")
     void countsOutcomes() {
         StoryProcessor processor = (id, tracker) -> {
             tracker.passed(2);
@@ -85,11 +85,12 @@ class PipelineSetupServiceTest {
         SetupProgress done = awaitEnd(service);
 
         assertThat(done.state()).isEqualTo(SetupState.DONE);
-        assertThat(done.completed()).isEqualTo(2);
+        assertThat(done.completed()).isEqualTo(1);
+        assertThat(done.skipped()).isEqualTo(1);
         assertThat(done.excluded()).isEqualTo(1);
         assertThat(done.stages().get(1).count()).isEqualTo(3);
         assertThat(published).allSatisfy(p -> assertThat(p.target())
-                .isEqualTo(p.completed() + p.inProgress() + p.excluded() + p.pending()));
+                .isEqualTo(p.completed() + p.skipped() + p.inProgress() + p.excluded() + p.pending()));
         assertThat(outcomes).hasSize(1);
     }
 
@@ -107,7 +108,7 @@ class PipelineSetupServiceTest {
         assertThat(done.state()).isEqualTo(SetupState.DONE);
         assertThat(done.recentLogs()).anySatisfy(l -> assertThat(l.meta()).contains("진행 화면만"));
         assertThat(published).allSatisfy(p -> assertThat(p.target())
-                .isEqualTo(p.completed() + p.inProgress() + p.excluded() + p.pending()));
+                .isEqualTo(p.completed() + p.skipped() + p.inProgress() + p.excluded() + p.pending()));
     }
 
     private static SetupProgress awaitEnd(PipelineSetupService service) {

@@ -46,8 +46,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * 관여하고 공유 상태를 두지 않으므로 병렬로 불러도 된다. 진행 상황 필드는 여러
  * 스레드가 함께 갱신하므로 전부 원자적 타입이다.
  *
- * 진행 상황은 target = completed + inProgress + excluded + pending 을 지킨다.
- * 화면의 진행바가 이 항등식에 의존한다.
+ * 진행 상황은 target = completed + skipped + inProgress + excluded + pending 을 지킨다.
+ * 화면의 진행바가 이 항등식에 의존한다. 이미 처리한 스토리는 completed 가 아니라 skipped 로 센다.
  *
  * @Async 를 쓰지 않는다. 같은 빈 안에서 호출하면 프록시를 거치지 않아 동기로 실행되고,
  * 그러면 run 이 처리를 다 끝낸 뒤에야 응답해 409 판정도 무너진다.
@@ -87,6 +87,7 @@ public class PipelineSetupService implements SetupService {
     private volatile boolean stopRequested;
     private volatile int target;
     private final AtomicInteger completed = new AtomicInteger();
+    private final AtomicInteger skipped = new AtomicInteger();
     private final AtomicInteger excluded = new AtomicInteger();
     private final AtomicInteger inProgress = new AtomicInteger();
     private volatile Instant startedAt;
@@ -127,6 +128,7 @@ public class PipelineSetupService implements SetupService {
         state = SetupState.RUNNING;
         target = limit;
         completed.set(0);
+        skipped.set(0);
         excluded.set(0);
         inProgress.set(0);
         startedAt = Instant.now();
@@ -145,6 +147,7 @@ public class PipelineSetupService implements SetupService {
     public SetupProgress progress() {
         int t = target;
         int c = completed.get();
+        int k = skipped.get();
         int e = excluded.get();
         int p = inProgress.get();
         List<StageProgress> stages = new ArrayList<>();
@@ -160,8 +163,8 @@ public class PipelineSetupService implements SetupService {
         synchronized (logs) {
             recent = List.copyOf(logs.subList(0, Math.min(RECENT_LOGS, logs.size())));
         }
-        return new SetupProgress(state, t, c, p, e, Math.max(0, t - c - e - p),
-                setupQuery.countSearchableStories(), eta(t, c + e), stages, setupQuery.exclusions(), recent);
+        return new SetupProgress(state, t, c, k, p, e, Math.max(0, t - c - k - e - p),
+                setupQuery.countSearchableStories(), eta(t, c + k + e), stages, setupQuery.exclusions(), recent);
     }
 
     @Override
@@ -233,11 +236,12 @@ public class PipelineSetupService implements SetupService {
         if (outcome == StoryOutcome.EXCLUDED) {
             excluded.incrementAndGet();
         }
+        else if (outcome == StoryOutcome.SKIPPED) {
+            skipped.incrementAndGet();
+            addLog(LogKind.EXCLUDE, id, String.valueOf(id), "이미 처리됨", LogState.OK);
+        }
         else if (outcome != null) {
             completed.incrementAndGet();
-            if (outcome == StoryOutcome.SKIPPED) {
-                addLog(LogKind.EXCLUDE, id, String.valueOf(id), "이미 처리됨", LogState.OK);
-            }
         }
         publish();
     }

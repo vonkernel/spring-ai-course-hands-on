@@ -38,7 +38,7 @@ export default function SetupTab({ status }) {
 
   if (!status) return <div className="page"><p className="sub">상태를 불러오는 중…</p></div>
 
-  const { target, completed, inProgress, excluded, pending } = status
+  const { target, completed, skipped, inProgress, excluded, pending } = status
   const pct = (n) => (target > 0 ? (n / target) * 100 : 0)
 
   return (
@@ -62,6 +62,7 @@ export default function SetupTab({ status }) {
       <div className="grid-kpi">
         <Kpi label="대상 스토리" value={target} foot="beststories 상위 100건" />
         <Kpi label="처리 완료" value={completed} foot="검색 대상으로 적재됨" color="var(--done)" />
+        <Kpi label="건너뜀" value={skipped} foot="이미 처리된 스토리" color="var(--skipped)" />
         <Kpi label="처리 중" value={inProgress} foot={runningStageName(status) ?? '—'} color="var(--running)" />
         <Kpi label="제외" value={excluded} color="var(--excluded)"
              foot={`기계적 ${status.exclusions.mechanical.total} · 판정 ${status.exclusions.judged.total}`} />
@@ -72,19 +73,21 @@ export default function SetupTab({ status }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
             <b>전체 진행률</b>
             <span className="num" style={{ color: 'var(--muted)', fontSize: 12 }}>
-              {completed + inProgress + excluded} / {target} 처리됨
+              {completed + skipped + inProgress + excluded} / {target} 처리됨
               {status.etaSeconds != null && ` · 예상 잔여 ${formatEta(status.etaSeconds)}`}
             </span>
           </div>
-          {/* 완료·진행중·제외·대기 4색 세그먼트 */}
+          {/* 완료·건너뜀·진행중·제외·대기 5색 세그먼트 */}
           <div className="progress">
             <i style={{ width: `${pct(completed)}%`, background: 'var(--done)' }} />
+            <i style={{ width: `${pct(skipped)}%`, background: 'var(--skipped)' }} />
             <i style={{ width: `${pct(inProgress)}%`, background: 'var(--running)' }} />
             <i style={{ width: `${pct(excluded)}%`, background: 'var(--excluded)' }} />
             <i style={{ width: `${pct(pending)}%`, background: 'var(--pending)' }} />
           </div>
           <div className="legend">
             <span><i className="dot" style={{ background: 'var(--done)' }} />완료 <b className="num">{completed}</b></span>
+            <span><i className="dot" style={{ background: 'var(--skipped)' }} />건너뜀 <b className="num">{skipped}</b></span>
             <span><i className="dot" style={{ background: 'var(--running)' }} />진행 중 <b className="num">{inProgress}</b></span>
             <span><i className="dot" style={{ background: 'var(--excluded)' }} />제외 <b className="num">{excluded}</b></span>
             <span><i className="dot" style={{ background: 'var(--pending)' }} />대기 <b className="num">{pending}</b></span>

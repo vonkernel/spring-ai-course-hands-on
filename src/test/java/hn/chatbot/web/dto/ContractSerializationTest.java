@@ -32,7 +32,7 @@ class ContractSerializationTest {
     @DisplayName("SetupStatus — 필드 이름과 2계층 제외 사유 구조가 문서와 같다")
     void setupStatus() throws Exception {
         SetupStatus status = new SetupStatus(
-                SetupState.RUNNING, 100, 63, 8, 24, 5, 63, 80,
+                SetupState.RUNNING, 100, 60, 3, 8, 24, 5, 63, 80,
                 List.of(new StageStatus(1, "수집", 100, StageState.DONE, 1.0),
                         new StageStatus(5, "LLM 분석", 71, StageState.RUNNING, 0.90)),
                 new SetupStatus.Exclusions(
@@ -45,7 +45,7 @@ class ContractSerializationTest {
         var json = mapper.readTree(mapper.writeValueAsString(status));
 
         assertThat(json.fieldNames()).toIterable().containsExactly(
-                "state", "target", "completed", "inProgress", "excluded", "pending",
+                "state", "target", "completed", "skipped", "inProgress", "excluded", "pending",
                 "searchableStories", "etaSeconds", "stages", "exclusions", "recentLogs");
         assertThat(json.get("state").asText()).isEqualTo("RUNNING");
         assertThat(json.get("exclusions").get("mechanical").get("reasons").get("TOO_SHORT").asInt())
@@ -59,20 +59,20 @@ class ContractSerializationTest {
     @Test
     @DisplayName("SetupStatus — 진행바가 의존하는 항등식")
     void progressIdentity() {
-        SetupStatus s = new SetupStatus(SetupState.RUNNING, 100, 63, 8, 24, 5, 63, 80,
+        SetupStatus s = new SetupStatus(SetupState.RUNNING, 100, 60, 3, 8, 24, 5, 63, 80,
                 List.of(), new SetupStatus.Exclusions(
                         new SetupStatus.ExclusionGroup(0, Map.of()),
                         new SetupStatus.ExclusionGroup(0, Map.of())),
                 List.of());
 
-        assertThat(s.completed() + s.inProgress() + s.excluded() + s.pending())
+        assertThat(s.completed() + s.skipped() + s.inProgress() + s.excluded() + s.pending())
                 .isEqualTo(s.target());
     }
 
     @Test
     @DisplayName("etaSeconds 는 산출 불가 시 null 로 나간다")
     void nullEta() throws Exception {
-        SetupStatus s = new SetupStatus(SetupState.IDLE, 0, 0, 0, 0, 0, 0, null,
+        SetupStatus s = new SetupStatus(SetupState.IDLE, 0, 0, 0, 0, 0, 0, 0, null,
                 List.of(), new SetupStatus.Exclusions(
                         new SetupStatus.ExclusionGroup(0, Map.of()),
                         new SetupStatus.ExclusionGroup(0, Map.of())),

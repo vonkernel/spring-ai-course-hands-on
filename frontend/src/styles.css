@@ -5,6 +5,7 @@
   --running: #2e7cf6;
   --excluded: #b54708;
   --pending: #d8dce3;
+  --skipped: #9ca3af;
   --bg: #f6f7f9;
   --surface: #ffffff;
   --border: #e6e8ec;
@@ -79,7 +80,7 @@ body {
 }
 .card-body { padding: 16px 18px; }
 
-.grid-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+.grid-kpi { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 14px; }
 .kpi { padding: 16px 18px; }
 .kpi .label { color: var(--muted); font-size: 13px; }
 .kpi .value { font-size: 32px; font-weight: 700; font-family: var(--mono); line-height: 1.25; }

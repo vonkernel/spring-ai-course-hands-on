@@ -13,7 +13,7 @@ final class SetupDtoMapper {
 
     static SetupStatus toStatus(SetupProgress p) {
         return new SetupStatus(
-                p.state(), p.target(), p.completed(), p.inProgress(), p.excluded(), p.pending(),
+                p.state(), p.target(), p.completed(), p.skipped(), p.inProgress(), p.excluded(), p.pending(),
                 p.searchableStories(), p.etaSeconds(),
                 p.stages().stream()
                         .map(s -> new StageStatus(s.step(), s.name(), s.count(), s.state(), s.progress()))
