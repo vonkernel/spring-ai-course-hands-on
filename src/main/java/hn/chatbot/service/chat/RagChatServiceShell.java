@@ -10,8 +10,15 @@ import java.time.Duration;
  * Q&A 1단계: 질문마다 검색하는 RAG.
  *
  * RetrievalAugmentationAdvisor 가 질문마다 SearchService 로 검색하고, RelevancePostProcessor 로
- * 근거를 고른 뒤, 근거를 질문에 붙여 모델에 넘긴다. 답변 지시는 system 프롬프트로 넣는다.
- * 구성은 실습 프롬프트로 전달한다.
+ * 근거를 고른 뒤, 근거를 질문에 붙여 모델에 넘긴다. 답변 지시는 한국어 system 프롬프트 상수로 둔다.
+ *
+ * 흐름
+ *
+ * 1 RetrievalAugmentationAdvisor 를 만든다. documentRetriever 는 SearchService,
+ *   documentPostProcessors 는 RelevancePostProcessor, queryAugmenter 는 ContextualQueryAugmenter 이고
+ *   그 documentFormatter 는 SearchEvidence::format 이다
+ * 2 system 은 답변 지시 상수, user 는 질문으로 하고 이 Advisor 를 붙인다
+ * 3 stream().chatClientResponse() 를 ChatTurn.streamWithEvidence 에 넘겨 돌려준다
  *
  * 답변 지시
  *

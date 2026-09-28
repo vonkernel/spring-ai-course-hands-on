@@ -7,8 +7,15 @@ import reactor.core.publisher.Flux;
  * Q&A 2단계: 도구와 대화 기억을 쓰는 에이전트.
  *
  * RetrievalAugmentationAdvisor 를 쓰지 않는다. IssueTools 를 도구로 등록하고 MessageChatMemoryAdvisor 를
- * 붙인다. 검색은 모델이 searchIssues 를 골랐을 때만 일어난다. 답변 지시는 system 프롬프트로 넣는다.
- * 구성은 실습 프롬프트로 전달한다.
+ * 붙인다. 검색은 모델이 searchIssues 를 골랐을 때만 일어난다. 답변 지시는 한국어 system 프롬프트 상수로 둔다.
+ *
+ * 흐름
+ *
+ * 1 IssueTools 를 도구로 등록하고, toolContext 에 conversationId(ChatMemory.CONVERSATION_ID),
+ *   ChatTurn(ChatTurn.KEY), 질문 원문(IssueTools.USER_QUESTION)을 넣는다
+ * 2 MessageChatMemoryAdvisor 를 붙이고 conversationId 를 Advisor 파라미터(ChatMemory.CONVERSATION_ID)로 넘긴다
+ * 3 system 은 답변 지시 상수, user 는 질문이다
+ * 4 stream().content() 를 ChatTurn.stream 에 넘겨 돌려준다
  *
  * 답변 지시: RagChatServiceShell 의 지시에 다음을 더한다
  *

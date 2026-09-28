@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 /**
  * 질문 하나를 받아 답변을 스트리밍한다.
  *
- * 구현은 둘이다. 단계마다 하나씩 채운다. 단계별 구성은 각 구현의 Javadoc 과 실습 프롬프트에 있다.
+ * 구현은 둘이다. 단계마다 하나씩 채운다. 단계별 구성은 각 구현의 Javadoc 에 있다.
  *
  * - 1단계 RagChatServiceShell: RetrievalAugmentationAdvisor 로 질문마다 검색하는 RAG
  * - 2단계 AgentChatServiceShell: 도구(IssueTools)와 대화 기억을 쓰는 에이전트.
