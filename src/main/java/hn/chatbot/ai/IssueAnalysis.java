@@ -16,7 +16,10 @@ import java.util.List;
  *
  * 서술 필드(summary · communityReaction · practicalImplication · unsuitableReason)는 한국어로 받는다.
  * keywords 의 고유명사 · 제품명은 원문 표기 그대로 두고(VMware, llama.cpp) 일반 개념어는 한국어로 쓴다.
- * 사용자가 쓴 표기로 계획 1 이 찾기 때문이다. techField · category 는 허용값 목록의 표기 그대로다.
+ * 사용자가 쓴 표기로 계획 1 이 찾기 때문이다.
+ *
+ * techField · category 는 허용값 목록의 값이거나, 폴백으로 만든 같은 표기(대문자와 밑줄)의 새 값이다.
+ * 목록과 폴백 규칙은 IssueAnalyzer 에 있다.
  *
  * summary 는 본문을 2~3문장으로 요약한다. communityReaction 은 최상위 댓글의 반응 경향이고,
  * 댓글이 없으면 반응이 없다는 취지로 짧게 적는다. practicalImplication 은 실무자에게
