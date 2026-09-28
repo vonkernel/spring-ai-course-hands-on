@@ -145,7 +145,7 @@ export default function ChatTab() {
 
 /**
  * 커뮤니티 반응과 실무 시사점은 검색에 쓰이지 않지만 응답에는 항상 포함된다.
- * 원문 대목은 적합성 판단이 원문 앞부분에서 뽑은 문장이다.
+ * 원문 인용은 적합성 판단이 원문 앞부분에서 그대로 뽑은 문장이다.
  * passage · practicalImplication 이 없는 스토리는 해당 줄을 생략한다.
  */
 function EvidenceCard({ e }) {
@@ -164,7 +164,7 @@ function EvidenceCard({ e }) {
 
       {e.passage && (
         <>
-          <div className="field-label">📄 원문 대목</div>
+          <div className="field-label">📄 원문 인용</div>
           <div className="field-body passage">“{e.passage}”</div>
         </>
       )}
