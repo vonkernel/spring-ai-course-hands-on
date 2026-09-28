@@ -1,8 +1,13 @@
 package hn.chatbot.service.chat;
 
+import hn.chatbot.search.SearchContext;
 import hn.chatbot.search.SearchService;
 import hn.chatbot.service.chat.port.ChatQuery;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.rag.Query;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -41,6 +46,19 @@ public class StoryTools {
     /** ToolContext 키. 모델이 다듬기 전의 사용자 원문. 도구를 등록하는 쪽이 넣고 searchStories 가 읽는다. */
     public static final String USER_QUESTION = "userQuestion";
 
+    /** 모델이 techField 에 넣을 수 있는 값. 폴백으로 새 값이 생기므로 listTopics 안내를 함께 둔다. */
+    static final String TECH_FIELDS = "허용값: AI_LLM, SECURITY_PRIVACY, OPEN_SOURCE, "
+            + "INFRASTRUCTURE_ENTERPRISE, PLATFORM_POLICY, DEV_CULTURE_PRACTICE, HARDWARE, "
+            + "MOBILITY, NON_TECHNICAL. 이 목록에 없는 분야를 찾을 때는 listTopics 로 실제 값을 먼저 확인한다";
+
+    /** 모델이 category 에 넣을 수 있는 값. */
+    static final String CATEGORIES = "허용값: OFFICIAL_ANNOUNCEMENT, RELEASE_NOTES, NEWS_REPORT, "
+            + "OPINION_ESSAY, TECHNICAL_DEEP_DIVE, RESEARCH_PAPER, SHOW_HN_PROJECT, ASK_TELL_HN, "
+            + "PRODUCT_MARKETING";
+
+    private static final int COMMENTS_DEFAULT_LIMIT = 5;
+    private static final int COMMENTS_MAX_LIMIT = 10;
+
     private final SearchService searchService;
     private final RelevancePostProcessor relevancePostProcessor;
     private final ChatQuery chatQuery;
@@ -71,8 +89,22 @@ public class StoryTools {
      * 2 · 3 은 RagChatServiceShell 이 RetrievalAugmentationAdvisor 에 넘기는 SearchService · RelevancePostProcessor 그대로다.
      * 그때는 Advisor 가 질문마다 불렀고, 이제는 모델이 이 도구를 골랐을 때만 부른다.
      */
-    public SearchEvidence searchStories(String query, String techField, String category, ToolContext ctx) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+    @Tool(description = "질의와 의미가 관련된 스토리를 찾아 근거를 돌려준다. "
+            + "'코딩 에이전트 한계가 뭐야' 처럼 특정 내용을 묻는 질문에 쓴다. "
+            + "개수를 세거나 분야별 목록을 나열할 때는 쓰지 않는다(그때는 countStories · listStories 를 쓴다).")
+    public SearchEvidence searchStories(
+            @ToolParam(description = "검색할 질문. 사용자의 질문을 그대로 또는 검색에 알맞게 다듬어 넣는다") String query,
+            @ToolParam(required = false, description = "찾을 기술 분야. 비우면 모든 분야에서 찾는다. " + TECH_FIELDS) String techField,
+            @ToolParam(required = false, description = "찾을 원문 타입. 예: 공식 발표만 찾을 때. 비우면 모든 원문 타입에서 찾는다. " + CATEGORIES) String category,
+            ToolContext ctx) {
+        Query search = SearchContext.query(query, (String) ctx.getContext().get(USER_QUESTION),
+                techField, category);
+        List<Document> candidates = searchService.retrieve(search);
+        List<Document> judged = relevancePostProcessor.process(search, candidates);
+        SearchEvidence evidence = SearchEvidence.of(search, judged);
+
+        ChatTurn.from(ctx).publish(search, evidence);
+        return evidence;
     }
 
     /**
@@ -80,8 +112,10 @@ public class StoryTools {
      *
      * storyId 를 이미 받아 호출되므로 대화 기억에 따로 남기지 않아도 된다.
      */
-    public StoryDetail getStoryDetail(long storyId) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+    @Tool(description = "특정 스토리 하나의 요약 · 커뮤니티 반응 · 실무 시사점을 가져온다. storyId 를 이미 알고 있을 때 쓴다.")
+    public StoryDetail getStoryDetail(@ToolParam(description = "조회할 스토리 id") long storyId) {
+        return chatQuery.storyDetail(storyId)
+                .orElseThrow(() -> new IllegalArgumentException("story not found: " + storyId));
     }
 
     /**
@@ -91,7 +125,12 @@ public class StoryTools {
      *
      * limit 은 비었거나 0 이하면 5, 10 을 넘으면 10 으로 자른다.
      */
-    public List<CommentView> getComments(long storyId, Integer limit) {
-        throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
+    @Tool(description = "특정 스토리의 실제 댓글을 가져온다. '방금 그 이슈 댓글 보여줘' 처럼 댓글 원문을 물을 때 쓴다.")
+    public List<CommentView> getComments(
+            @ToolParam(description = "댓글을 가져올 스토리 id") long storyId,
+            @ToolParam(required = false, description = "최대 개수. 비우면 기본값을 쓰고, 상한을 넘으면 상한으로 자른다") Integer limit) {
+        // 비거나 말이 안 되는 값은 기본값으로 되돌린다. 큰 값만 상한으로 자른다.
+        int effectiveLimit = limit == null || limit <= 0 ? COMMENTS_DEFAULT_LIMIT : Math.min(limit, COMMENTS_MAX_LIMIT);
+        return chatQuery.comments(storyId, effectiveLimit);
     }
 }
