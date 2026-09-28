@@ -26,6 +26,7 @@ import reactor.core.publisher.Flux;
  * 답변 지시: RagChatServiceShell 의 지시에 다음을 더한다
  *
  * - 검색 조건을 해석한다. 필터를 걸어 결과가 없으면 필터를 풀지 말고 그 사실을 말한다
+ * - 근거 번호([1] 등)는 searchStories 로 받은 근거에만 붙인다. 목록 · 건수 · 요약 결과에는 붙이지 않는다
  *
  * @Service 와 @Primary 를 붙여 ChatController 가 RagChatServiceShell 대신 이 구현을 주입받게 한다.
  * 붙이기 전에는 빈(Bean)으로 등록되지 않으므로 Q&A 탭은 RagChatServiceShell 로 답한다.
