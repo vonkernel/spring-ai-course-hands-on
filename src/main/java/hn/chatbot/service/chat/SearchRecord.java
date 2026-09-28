@@ -9,8 +9,8 @@ import java.util.stream.IntStream;
 /**
  * 대화 기억에 남길 검색 기록 문구를 만든다. 완성본이다.
  *
- * 도구 호출의 중간 메시지는 기억에 남지 않으므로, 목록을 돌려주는 도구가 이 문구를
- * AssistantMessage 로 직접 기록한다. SystemMessage 로 기록하지 않는다.
+ * 도구 호출의 중간 메시지는 기억에 남지 않으므로, 목록을 돌려주는 도구가 결과를 ChatTurn 에 넘기면
+ * ChatTurn 이 이 문구를 AssistantMessage 로 기록한다. SystemMessage 로 기록하지 않는다.
  * MessageWindowChatMemory 는 새 SystemMessage 가 들어오면 이전 것을 모두 지운다.
  *
  * 번호는 화면의 근거 카드 순서와 같다. "두 번째 이슈"가 화면과 어긋나지 않게 한다.

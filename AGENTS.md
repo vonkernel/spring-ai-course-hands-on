@@ -15,7 +15,8 @@ search/plan/              벡터 검색 계획 2개 (BodyVectorPlan · SummaryVe
 service/chat/RelevancePostProcessorShell   근거 후처리
 service/chat/IssueTools   모델이 호출하는 도구 7종
 service/chat/RagChatServiceShell      Q&A 1단계: 질문마다 검색하는 RAG
-service/chat/AgentChatServiceShell    Q&A 2단계: 도구와 기억을 쓰는 에이전트
+service/chat/AgentChatServiceShell    Q&A 2단계: 도구를 쓰는 에이전트
+service/chat/MemoryChatServiceShell   Q&A 3단계: 2단계를 상속해 대화 기억을 더한 에이전트
 ```
 
 **각 클래스의 Javadoc 이 구현 명세다.** 입력과 반환값, 주의 사항이

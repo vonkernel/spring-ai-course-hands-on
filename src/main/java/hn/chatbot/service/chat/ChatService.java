@@ -6,11 +6,12 @@ import reactor.core.publisher.Flux;
 /**
  * 질문 하나를 받아 답변을 스트리밍한다.
  *
- * 구현은 둘이다. 단계마다 하나씩 채운다. 단계별 구성은 각 구현의 Javadoc 에 있다.
+ * 구현은 셋이다. 단계마다 하나씩 채운다. 단계별 구성은 각 구현의 Javadoc 에 있다.
+ * ChatController 는 @Primary 가 붙은 구현을 주입받는다. 새 단계를 채우면 @Primary 를 그 구현으로 옮긴다.
  *
  * - 1단계 RagChatServiceShell: RetrievalAugmentationAdvisor 로 질문마다 검색하는 RAG
- * - 2단계 AgentChatServiceShell: 도구(IssueTools)와 대화 기억을 쓰는 에이전트.
- *   @Primary 를 붙여 ChatController 가 이 구현을 주입받게 한다
+ * - 2단계 AgentChatServiceShell: 도구(IssueTools)를 쓰는 에이전트
+ * - 3단계 MemoryChatServiceShell: AgentChatServiceShell 을 상속해 대화 기억을 더한 에이전트
  *
  * 공통
  *

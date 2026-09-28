@@ -5,7 +5,6 @@ import hn.chatbot.service.chat.port.ChatQuery;
 import hn.chatbot.service.topic.TopicService;
 import hn.chatbot.service.topic.model.StorySummary;
 import hn.chatbot.service.topic.model.TopicDistribution;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.stereotype.Component;
 
@@ -36,8 +35,7 @@ import java.util.List;
  *
  * ToolContext 를 받는 도구는 모든 호출이 .toolContext(...) 를 채워야 한다.
  * 빠뜨리면 모델을 호출하기도 전에 IllegalArgumentException 이 난다.
- * 도구 호출의 중간 메시지는 대화 기억에 남지 않으므로, 목록을 돌려주는 도구는
- * 결과를 직접 기록한다. 문구는 SearchRecord 가 만든다.
+ * searchIssues · listStories 는 결과를 ChatTurn 에 넘긴다. 화면 전송과 기억 기록은 ChatTurn 이 맡는다.
  */
 @Component
 public class IssueTools {
@@ -49,15 +47,13 @@ public class IssueTools {
     private final RelevancePostProcessor relevancePostProcessor;
     private final TopicService topicService;
     private final ChatQuery chatQuery;
-    private final ChatMemory chatMemory;
 
     public IssueTools(SearchService searchService, RelevancePostProcessor relevancePostProcessor,
-                      TopicService topicService, ChatQuery chatQuery, ChatMemory chatMemory) {
+                      TopicService topicService, ChatQuery chatQuery) {
         this.searchService = searchService;
         this.relevancePostProcessor = relevancePostProcessor;
         this.topicService = topicService;
         this.chatQuery = chatQuery;
-        this.chatMemory = chatMemory;
     }
 
     /**
@@ -74,11 +70,10 @@ public class IssueTools {
      * 2 SearchService.retrieve 로 후보를 찾는다. 계획별 요약은 Query 의 컨텍스트에 기록된다
      * 3 RelevancePostProcessor.process 로 근거를 고른다
      * 4 SearchEvidence.of(Query, 근거) 로 합친다
-     * 5 ChatTurn.from(ctx).publish 로 화면에 사건을 보낸다
-     * 6 ctx 의 conversationId 로 SearchRecord.of 문구를 AssistantMessage 로 기억에 기록한다
-     * 7 SearchEvidence 를 돌려준다. 모델이 이것으로 답을 쓴다
+     * 5 ChatTurn.from(ctx).publish(Query, SearchEvidence) 로 결과를 넘긴다. 화면 사건과 기억 기록은 ChatTurn 이 맡는다
+     * 6 SearchEvidence 를 돌려준다. 모델이 이것으로 답을 쓴다
      *
-     * 2 · 3 은 RagChatServiceShell 이 RetrievalAugmentationAdvisor 에 넘기는 부품 그대로다.
+     * 2 · 3 은 RagChatServiceShell 이 RetrievalAugmentationAdvisor 에 넘기는 SearchService · RelevancePostProcessor 그대로다.
      * 그때는 Advisor 가 질문마다 불렀고, 이제는 모델이 이 도구를 골랐을 때만 부른다.
      */
     public SearchEvidence searchIssues(String query, String techField, String category, ToolContext ctx) {
@@ -107,7 +102,7 @@ public class IssueTools {
      *
      * limit 은 비었거나 0 이하면 20, 50 을 넘으면 50 으로 자른다.
      *
-     * 결과를 SearchRecord.ofStories 문구로 대화 기억에 기록한다.
+     * 결과를 ChatTurn.from(ctx).publishStories 로 넘긴다. sortBy 는 실제로 쓴 정렬 이름을 넘긴다.
      */
     public List<StorySummary> listStories(String techField, String sortBy, Integer limit, ToolContext ctx) {
         throw new UnsupportedOperationException("아직 구현되지 않았습니다. 이 메서드를 채우세요.");
